@@ -9,8 +9,8 @@
 
 :root{--head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;--bg:#edf1f2;--ink:#0f2530;--green:#08374b;--on-green:#edf1f2;--ochre:#e8743b;--sel:#86c99c;--on-ochre:#051f2b;--line:#c5d0d4;--busy:#08374b;--ask:#e8743b;--muted:#4f6168;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--busy:#5fa8c4;--muted:#9db1ba}}
-:root[data-theme="dark"]{--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--busy:#5fa8c4;--muted:#9db1ba}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--ink:#e3ecef;--green:#08374b;--on-green:#e3ecef;--line:#223742;--busy:#5fa8c4;--muted:#9db1ba}}
+:root[data-theme="dark"]{--bg:#0b1a22;--ink:#e3ecef;--green:#08374b;--on-green:#e3ecef;--line:#223742;--busy:#5fa8c4;--muted:#9db1ba}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -71,6 +71,7 @@ dialog button{position:absolute;top:8px;right:8px;width:40px;height:40px;border:
 .small{font-size:.88rem;color:var(--muted)}
 footer{background:var(--green);color:var(--on-green);padding:40px 0;font-size:.95rem}
 footer .wrap{display:flex;flex-wrap:wrap;gap:24px 60px}
+@media (max-width:640px){nav{gap:10px 20px;padding:14px 0}nav b{flex-basis:100%;margin:0 0 4px}nav b img{height:60px}nav a{font-size:.95rem}}
 @media (max-width:760px){.two{grid-template-columns:1fr}.events li{grid-template-columns:1fr}section{padding:48px 0}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
