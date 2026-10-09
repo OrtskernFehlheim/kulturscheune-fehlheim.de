@@ -6,9 +6,9 @@
 <style>
 @font-face{font-family:"Kulturscheune Head";src:local("Avenir Next Heavy"),local("AvenirNext-Heavy"),url("fonts/headline.woff2") format("woff2");font-weight:700 900;font-display:swap}
 
-:root{--head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;--bg:#edf1f2;--ink:#0f2530;--green:#08374b;--on-green:#edf1f2;--ochre:#e8743b;--line:#c5d0d4;--muted:#4f6168;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--muted:#9db1ba}}
-:root[data-theme="dark"]{--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--muted:#9db1ba}
+:root{--head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;--bg:#edf1f2;--ink:#0f2530;--green:#08374b;--on-green:#edf1f2;--ochre:#e8743b;--accent-text:#b04d17;--line:#c5d0d4;--muted:#4f6168;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--muted:#9db1ba;--accent-text:#f08a55}}
+:root[data-theme="dark"]{--bg:#0b1a22;--ink:#e3ecef;--green:#062635;--on-green:#e3ecef;--line:#223742;--muted:#9db1ba;--accent-text:#f08a55}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
 h1,h2{font-family:var(--head);font-weight:800;letter-spacing:-.015em;line-height:1.12}
@@ -16,24 +16,52 @@ h1{text-transform:lowercase;font-size:clamp(2rem,5vw,3rem);margin:0 0 .6em}h2{fo
 a{color:inherit}:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
 header{background:var(--green);color:var(--on-green);padding:18px 0}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-main{padding:48px 0 72px}p,ul{margin:.5em 0}.note{border-left:4px solid var(--ochre);padding:6px 14px;color:var(--muted);font-size:.92rem}
+main{padding:48px 0 72px}p,ul{margin:.5em 0}
+.board p{margin:0 0 1.1em}
+.role{display:block;font-weight:700}
+.accent{color:var(--accent-text);font-weight:600}
+a.accent{text-decoration:underline;text-underline-offset:3px}
+hr{border:0;border-top:1px solid var(--line);margin:2.5em 0}
+h3{font-size:1.05rem;margin:1.4em 0 .3em}
 </style></head><body>
 <header><div class="wrap"><a href="index.html">&larr; Zur Startseite</a></div></header>
 <main><div class="wrap"><h1>Impressum</h1>
-<h2>Angaben nach § 5 DDG</h2>
-<p><strong>Ortskern Fehlheim e.V.</strong><br>Bensheimer Str. 3A<br>64625 Fehlheim</p>
+
+<h2>Angaben gemäß § 5 DDG</h2>
+<p><strong>Ortskern Fehlheim e.V.</strong><br>Bensheimer Straße 3A<br>64625 Fehlheim</p>
 <p>Die Website „Kulturscheune Fehlheim“ ist ein Projekt des Ortskern Fehlheim e.V.</p>
-<h2>Vertretungsberechtigter Vorstand</h2>
-<p>1. Vorsitzender: Andreas Balles<br>2. Vorsitzender: Jan Kinsky<br>Kassenwartin: Charlotte Mundt</p>
+
+<h2>Vertreten durch den Vorstand gemäß § 26 BGB</h2>
+<div class="board">
+<p><span class="role">1. Vorsitzender</span>Andreas Balles<br>Bensheimer Straße 3A<br>64625 Bensheim</p>
+<p><span class="role">2. Vorsitzender</span>Jan Kinsky<br>Rodauer Straße 2<br>64625 Bensheim</p>
+<p><span class="role">Kassenwartin</span>Charlotte Mundt<br>Bensheimer Straße 3A<br>64625 Bensheim</p>
+</div>
 <p>Jeweils zwei der drei Genannten vertreten den Verein gemeinsam.</p>
-<h2>Registereintrag</h2>
-<p>Eingetragen im Vereinsregister<br>Registergericht: Amtsgericht Darmstadt<br>Registernummer: VR 85235</p>
+
 <h2>Kontakt</h2>
-<p>E-Mail: info@kulturscheune-fehlheim.de</p>
+<p>E-Mail: <a class="accent" href="mailto:info@kulturscheune-fehlheim.de">info@kulturscheune-fehlheim.de</a><br>
+Website: <a class="accent" href="https://kulturscheune-fehlheim.de">kulturscheune-fehlheim.de</a></p>
+
+<h2>Registereintrag</h2>
+<p>Eintragung im Vereinsregister<br>Registergericht: Amtsgericht Darmstadt<br>Registernummer: VR 85235</p>
+
 <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-<p>Jan Kinsky<br>Anschrift wie oben</p>
+<p>Jan Kinsky<br>Rodauer Straße 2<br>64625 Bensheim</p>
+
+<hr>
+
 <h2>Streitbeilegung</h2>
 <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+
 <h2>Bildnachweis</h2>
 <p>Foto des Alten Rathauses: Jan Kinsky<br>Logo und Veranstaltungsflyer: Ortskern Fehlheim e.V.</p>
+
+<h2>Haftungsausschluss</h2>
+<h3>Haftung für Inhalte</h3>
+<p>Wir erstellen die Inhalte dieser Website mit Sorgfalt. Für die Richtigkeit, Vollständigkeit und Aktualität, etwa von Terminen und Raumbelegungen, können wir jedoch keine Gewähr übernehmen. Als Anbieter sind wir nach § 7 Abs. 1 DDG für eigene Inhalte nach den allgemeinen Gesetzen verantwortlich. Werden uns Fehler oder Rechtsverletzungen bekannt, korrigieren oder entfernen wir die betreffenden Inhalte umgehend.</p>
+<h3>Haftung für Links</h3>
+<p>Diese Website enthält Links zu Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für diese Inhalte ist der jeweilige Anbieter verantwortlich. Zum Zeitpunkt der Verlinkung waren keine Rechtsverstöße erkennbar. Werden uns Rechtsverletzungen bekannt, entfernen wir den betreffenden Link umgehend.</p>
+<h3>Urheberrecht</h3>
+<p>Texte, Fotos, Logo und Veranstaltungsflyer auf dieser Website sind urheberrechtlich geschützt. Eine Vervielfältigung oder Verwendung außerhalb dieser Website ist nur mit vorheriger Zustimmung des Ortskern Fehlheim e.V. bzw. der jeweiligen Urheberinnen und Urheber erlaubt. Auf den Flyern genannte Künstlerinnen, Künstler und Partner behalten die Rechte an ihren Namen, Werken und Logos.</p>
 </div></main></body></html>
