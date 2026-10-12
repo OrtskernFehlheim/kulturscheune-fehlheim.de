@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kulturscheune Fehlheim – Ein Projekt des Ortskern Fehlheim e.V.</title>
-<meta name="description" content="Lesungen, Konzerte, Basteltage und Räume für Vereine im Alten Rathaus Fehlheim.">
+<meta name="description" content="Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -52,39 +52,41 @@ section{padding:clamp(64px,10vw,120px) 0}
 .menu-btn{display:none;background:none;border:2px solid var(--on-petrol);color:var(--on-petrol);border-radius:999px;font:inherit;font-family:var(--head);font-weight:800;text-transform:lowercase;padding:8px 18px;cursor:pointer}
 
 /* Hero */
-.hero{position:relative;min-height:min(88vh,820px);display:flex;align-items:flex-end;color:#fff;padding:0;overflow:hidden;background:var(--petrol)}
+.hero{position:relative;min-height:min(74vh,700px);display:flex;align-items:flex-start;color:#fff;padding:0;overflow:hidden;background:var(--petrol)}
 .hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 35%}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(8,55,75,.97) 0%,rgba(8,55,75,.82) 30%,rgba(8,55,75,.25) 62%,rgba(8,55,75,.05) 100%)}
-.hero .wrap{position:relative;z-index:1;width:100%;padding-bottom:clamp(48px,8vw,96px)}
-.hero h1{font-size:clamp(2.4rem,11.6vw,9rem);line-height:.86;letter-spacing:-.035em;margin-bottom:.35em}
-.hero .lead{font-size:clamp(1.1rem,2.2vw,1.35rem);max-width:34ch;margin-bottom:1.6em;opacity:.95}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(165deg,rgba(8,55,75,.85) 0%,rgba(8,55,75,.5) 28%,rgba(8,55,75,0) 55%)}
+.hero .wrap{position:relative;z-index:1;width:100%;padding-top:clamp(40px,6vw,80px);padding-bottom:40px}
+.hero h1{font-size:clamp(2.6rem,6.6vw,5.4rem);line-height:.9;letter-spacing:-.035em;margin:0}
+.band{background:var(--petrol);color:var(--on-petrol);padding:30px 0}
+.band .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 48px}
+.band .lead{font-size:clamp(1.08rem,1.6vw,1.28rem);margin:0;max-width:52ch}
 .hero .by{font-size:.95rem;opacity:.8;margin-bottom:.4em}
 
 /* Als nächstes */
-.next{padding-bottom:0}
-.next-card{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(28px,5vw,72px);align-items:center}
+.next-card{margin-top:12px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(28px,5vw,72px);align-items:center}
 .next-flyer{border:0;padding:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 18px 50px -20px rgba(8,55,75,.55)}
 .next-flyer img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center top}
 .kicker{font-family:var(--head);font-weight:800;text-transform:lowercase;color:var(--orange-text);font-size:1.1rem;margin-bottom:.6em}
-.bigdate{font-family:var(--head);font-weight:800;line-height:.85;letter-spacing:-.04em;font-size:clamp(4.5rem,13vw,9.5rem);color:var(--ink)}
-.bigdate small{display:block;font-size:.32em;letter-spacing:-.01em;line-height:1.2;color:var(--muted);margin-top:.25em}
-.next h3{font-size:clamp(1.6rem,3.4vw,2.3rem);margin:.6em 0 .5em}
+.weekday{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:clamp(1.3rem,2.4vw,1.8rem);color:var(--muted);margin:0 0 .1em}
+.bigdate{font-family:var(--head);font-weight:800;line-height:.9;letter-spacing:-.04em;font-size:clamp(3.2rem,7.4vw,6.6rem);color:var(--ink);white-space:nowrap}
+.next-card h3{font-size:clamp(1.6rem,3.4vw,2.3rem);margin:.6em 0 .5em}
 .plan{list-style:none;padding:0;margin:0 0 1.6em;border-top:1px solid var(--line)}
 .plan li{padding:10px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:5.5em 1fr;gap:12px}
 .plan b{font-family:var(--head);font-weight:800}
-.next .btn-ghost{color:var(--ink)}
-.next .btn-ghost:hover{background:var(--line)}
+.next-card .btn-ghost{color:var(--ink)}
+.next-card .btn-ghost:hover{background:var(--line)}
 
 /* Programm */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;margin-top:8px}
-.tile{position:relative;display:block;text-align:left;background:var(--surface);color:inherit;border:0;padding:0;border-radius:12px;overflow:hidden;font:inherit;cursor:zoom-in;transition:transform .2s}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;height:100%;text-align:left;background:var(--surface);color:inherit;border:0;padding:0;border-radius:12px;overflow:hidden;font:inherit;cursor:zoom-in;transition:transform .2s}
 .tile:hover{transform:translateY(-3px)}
 .tile img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center top}
 .tile .chip{position:absolute;top:12px;left:12px;background:var(--petrol);color:#fff;font-family:var(--head);font-weight:800;font-size:.9rem;padding:5px 11px;border-radius:999px}
-.tile .cap{display:block;padding:14px 16px 16px}
+.tile .cap{display:block;flex:1 1 auto;padding:14px 16px 16px}
 .tile .cap b{display:block;font-family:var(--head);font-weight:800;font-size:1.08rem;line-height:1.2}
 .tile .cap span{color:var(--muted);font-size:.92rem}
 .tiles.past{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.tiles.past .chip{display:none}
 .past-h{margin-top:clamp(48px,7vw,80px);font-size:1.6rem;margin-bottom:.8em}
 .empty{color:var(--muted)}
 
@@ -142,7 +144,7 @@ footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
 footer h3{font-size:1.15rem;margin-bottom:.6em}
 footer a{text-underline-offset:3px}
 footer .legal{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);opacity:.75;font-size:.85rem}
-footer .mail{color:#f6a77c;font-weight:700}
+footer .mail{color:inherit}
 
 /* Dialog */
 dialog{border:0;padding:0;max-width:min(92vw,760px);background:transparent}
@@ -152,6 +154,11 @@ dialog button{position:absolute;top:10px;right:10px;width:44px;height:44px;borde
 
 /* Mobil */
 @media (max-width:860px){
+ .hero{flex-direction:column;align-items:stretch;min-height:0}
+ .hero>img{position:relative;order:2;height:auto;aspect-ratio:4/3;object-position:60% 40%}
+ .hero::after{display:none}
+ .hero .wrap{order:1;padding-top:36px;padding-bottom:28px}
+ .band{padding:26px 0 30px}
  .menu-btn{display:block}
  .menu{display:none;position:fixed;inset:72px 0 0 0;background:var(--petrol);flex-direction:column;gap:0;padding:24px 20px;margin-top:env(safe-area-inset-top,0px)}
  .top.open .menu{display:flex}
@@ -172,7 +179,7 @@ dialog button{position:absolute;top:10px;right:10px;width:44px;height:44px;borde
  .grid{gap:4px}.grid>*{border-radius:8px;font-size:.9rem}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tile,.btn{transition:none}.tile:hover{transform:none}}
-@media (prefers-reduced-motion:no-preference){.hero h1,.hero .lead,.hero .by,.hero .btns{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}.hero .lead{animation-delay:.1s}.hero .btns{animation-delay:.2s}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}}
+@media (prefers-reduced-motion:no-preference){.hero h1,.hero .by,.band .lead,.band .btns{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}.band .lead{animation-delay:.15s}.band .btns{animation-delay:.25s}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}}
 </style>
 </head>
 <body>
@@ -197,20 +204,20 @@ dialog button{position:absolute;top:10px;right:10px;width:44px;height:44px;borde
  <div class="wrap">
   <p class="by">Ein Projekt des Ortskern Fehlheim e.V.</p>
   <h1>kulturscheune<br>fehlheim</h1>
-  <p class="lead">Lesungen, Konzerte und Basteltage im Alten Rathaus. Und Räume für alle Vereine im Ort.</p>
+ </div>
+</section>
+<div class="band">
+ <div class="wrap">
+  <p class="lead">Kultur und Begegnung mitten im Ort. Das Alte Rathaus öffnet seine Türen für alle in Fehlheim und für die Vereine, die hier zu Hause sind.</p>
   <div class="btns"><a class="btn btn-primary" href="#programm">Programm ansehen</a><a class="btn btn-ghost" href="#raum">Raum anfragen</a></div>
  </div>
-</section>
+</div>
 
-<section class="next" id="programm" aria-labelledby="next-h">
- <div class="wrap">
-  <div class="next-card" id="nextCard"></div>
- </div>
-</section>
-
-<section aria-labelledby="prog-h">
+<section id="programm" aria-labelledby="prog-h">
  <div class="wrap">
   <h2 id="prog-h">programm</h2>
+  <div class="next-card" id="nextCard"></div>
+  <h3 class="past-h" id="moreh" hidden>weitere termine</h3>
   <div class="tiles" id="kommt"></div>
   <h3 class="past-h" id="pasth" hidden>rückblick</h3>
   <div class="tiles past" id="past"></div>
@@ -332,15 +339,15 @@ if(kommt.length){
  var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;fb.appendChild(im);fb.onclick=function(){zeige(e)};
  var info=el("div");
  info.appendChild(el("p","kicker","als nächstes"));
- var bd=el("div","bigdate");bd.id="next-h";bd.appendChild(document.createTextNode(d.getDate()+". "+M[d.getMonth()].slice(0,3).toLowerCase()+"."));
- bd.appendChild(el("small",null,d.toLocaleDateString("de-DE",{weekday:"long"})+", "+d.getFullYear()));info.appendChild(bd);
+ info.appendChild(el("p","weekday",d.toLocaleDateString("de-DE",{weekday:"long"})));
+ var bd=el("div","bigdate",d.getDate()+". "+M[d.getMonth()].slice(0,3).toLowerCase()+". "+String(d.getFullYear()).slice(2));bd.setAttribute("aria-label",lang(e.datum));info.appendChild(bd);
  info.appendChild(el("h3",null,e.titel));
  if(e.programm){var ul=el("ul","plan");e.programm.forEach(function(r){var li=el("li");li.appendChild(el("b",null,r[0]));li.appendChild(el("span",null,r[1]));ul.appendChild(li)});info.appendChild(ul)}
  if(e.hinweis)info.appendChild(el("p","small",e.hinweis));
  var bt=el("div","btns");var b1=el("button","btn btn-ghost","Flyer ansehen");b1.type="button";b1.onclick=function(){zeige(e)};bt.appendChild(b1);info.appendChild(bt);
  nc.appendChild(fb);nc.appendChild(info);
 }else{
- nc.parentNode.parentNode.hidden=true;
+ nc.hidden=true;
 }
 function kachel(e){
  var b=el("button","tile");b.type="button";b.onclick=function(){zeige(e)};
@@ -350,8 +357,8 @@ function kachel(e){
  return b;
 }
 var k=document.getElementById("kommt"),rest=kommt.slice(1);
-if(rest.length)rest.forEach(function(e){k.appendChild(kachel(e))});
-else k.appendChild(el("p","empty",kommt.length?"Weitere Termine folgen bald.":"Aktuell sind keine Termine geplant. Schaut bald wieder vorbei."));
+if(rest.length){document.getElementById("moreh").hidden=false;rest.forEach(function(e){k.appendChild(kachel(e))})}
+else if(!kommt.length)k.appendChild(el("p","empty","Aktuell sind keine Termine geplant. Schaut bald wieder vorbei."));
 if(war.length){document.getElementById("pasth").hidden=false;war.forEach(function(e){document.getElementById("past").appendChild(kachel(e))})}
 document.getElementById("x").onclick=function(){dlg.close()};
 dlg.addEventListener("click",function(ev){if(ev.target===dlg)dlg.close()});
