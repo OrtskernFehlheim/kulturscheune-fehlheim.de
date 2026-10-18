@@ -1,0 +1,77 @@
+# Einstellungen für Pages CMS (https://app.pagescms.org)
+# Legt fest, welche Formulare ihr zum Pflegen der Website bekommt.
+
+media:
+  input: flyer
+  output: /flyer
+  extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: veranstaltungen
+    label: Veranstaltungen
+    type: file
+    path: daten/veranstaltungen.json
+    format: json
+    list: true
+    fields:
+      - name: titel
+        label: Titel
+        type: string
+        required: true
+      - name: datum
+        label: Datum
+        type: date
+        required: true
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: flyer
+        label: Flyer (quadratisch, ca. 1080 × 1080 Pixel)
+        type: image
+        required: true
+      - name: programm
+        label: Ablauf (optional)
+        type: object
+        list: true
+        fields:
+          - name: zeit
+            label: Uhrzeit
+            type: string
+          - name: text
+            label: Was passiert
+            type: string
+      - name: hinweis
+        label: Hinweis (optional, z. B. „Bitte Tasse mitbringen!“)
+        type: string
+
+  - name: raumbelegung
+    label: Raumbelegung
+    type: file
+    path: daten/raumbelegung.json
+    format: json
+    list: true
+    fields:
+      - name: von
+        label: Datum (bzw. erster Tag)
+        type: date
+        required: true
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: bis
+        label: Bis (nur bei mehreren Tagen ausfüllen)
+        type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: status
+        label: Status
+        type: select
+        required: true
+        default: belegt
+        options:
+          values:
+            - name: belegt
+              label: Belegt (bestätigt)
+            - name: angefragt
+              label: Angefragt (noch offen)
