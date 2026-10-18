@@ -9,10 +9,17 @@ media:
 content:
   - name: veranstaltungen
     label: Veranstaltungen
-    type: file
-    path: daten/veranstaltungen.json
+    type: collection
+    path: _data/veranstaltungen
     format: json
-    list: true
+    filename: "{datum}-{titel}.json"
+    view:
+      fields: [titel, datum, kategorie]
+      primary: titel
+      sort: [datum, titel]
+      default:
+        sort: datum
+        order: desc
     fields:
       - name: titel
         label: Titel
@@ -25,6 +32,21 @@ content:
         default: ""
         options:
           format: yyyy-MM-dd
+      - name: kategorie
+        label: Wo soll die Veranstaltung erscheinen?
+        type: select
+        required: true
+        default: automatisch
+        options:
+          values:
+            - name: automatisch
+              label: Automatisch nach Datum (empfohlen)
+            - name: naechste
+              label: Nächste Veranstaltungen
+            - name: rueckblick
+              label: Rückblick
+            - name: versteckt
+              label: Nicht anzeigen
       - name: flyer
         label: Flyer (quadratisch, ca. 1080 × 1080 Pixel)
         type: image
