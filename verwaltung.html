@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raumbelegung verwalten – Kulturscheune Fehlheim</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon.ico" sizes="any">
+<meta name="theme-color" content="#08374b">
+<style>
+:root{
+ --head:"Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;
+ --petrol:#08374b;--on-petrol:#edf1f2;--bg:#eef2f3;--surface:#fff;--ink:#0f2530;--muted:#4f6168;--line:#d3dcdf;
+ --orange:#e8743b;--on-orange:#1b1007;--busy:#08374b;--on-busy:#fff;--ok:#2f7d4f;--err:#b3261e;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--surface:#11262f;--ink:#e3ecef;--muted:#9db1ba;--line:#223742;--busy:#5fa8c4;--on-busy:#06202b;--ok:#7fd1a1;--err:#ff8a80}}
+:root[data-theme="dark"]{--bg:#0b1a22;--surface:#11262f;--ink:#e3ecef;--muted:#9db1ba;--line:#223742;--busy:#5fa8c4;--on-busy:#06202b;--ok:#7fd1a1;--err:#ff8a80}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,.head{font-family:var(--head);font-weight:800;text-transform:lowercase;letter-spacing:-.02em;margin:0}
+header{background:var(--petrol);color:var(--on-petrol)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+header a{color:inherit;font-size:.92rem}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+main{padding:28px 0 64px}
+h1{font-size:clamp(1.8rem,5vw,2.4rem);margin-bottom:.3em}
+p{margin:0 0 1em}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border-radius:16px;padding:20px;margin-top:16px}
+label{display:grid;gap:6px;font-weight:600;font-size:.92rem;margin-bottom:14px}
+input{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+button{font:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;padding:12px 20px;border-radius:999px;border:2px solid transparent;cursor:pointer}
+.btn-primary{background:var(--orange);color:var(--on-orange)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-head strong{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.4rem}
+.cal-head button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:1.3rem;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid>*{aspect-ratio:1/1;display:grid;place-items:center;border-radius:10px;font-variant-numeric:tabular-nums}
+.grid .dow{aspect-ratio:auto;color:var(--muted);font-size:.8rem;font-weight:600;padding-bottom:4px}
+.grid button.day{border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;font-size:1rem;position:relative}
+.grid button.day:hover{border-color:var(--ink)}
+.grid button.belegt{background:var(--busy);color:var(--on-busy);border-color:var(--busy);font-weight:700}
+.grid button.angefragt{background:var(--orange);color:var(--on-orange);border-color:var(--orange);font-weight:700}
+.grid .changed::after{content:"";position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--surface)}
+.grid .past{opacity:.45}
+.grid .today{box-shadow:inset 0 0 0 2px var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;font-size:.86rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:14px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-top:24px}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#msg{font-size:.92rem}
+#msg.ok{color:var(--ok)}#msg.err{color:var(--err)}
+dialog{border:0;border-radius:18px;padding:22px;background:var(--surface);color:var(--ink);width:min(92vw,380px)}
+dialog::backdrop{background:rgba(4,20,28,.6)}
+dialog h2{font-size:1.4rem;margin-bottom:14px}
+.choices{display:grid;gap:10px}
+.choice{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;font-weight:600}
+.choice i{width:18px;height:18px;border-radius:5px;flex:none}
+.choice[aria-pressed="true"]{border-color:var(--ink)}
+.small{font-size:.86rem}
+details{margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+ol{padding-left:1.2em;margin:.6em 0}
+li{margin-bottom:.4em}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="head" style="font-size:1.15rem">raumbelegung</span><a href="index.html">Zur Website</a></div></header>
+
+<main>
+ <div class="wrap">
+
+  <!-- Anmeldung -->
+  <section id="login" hidden>
+   <h1>anmelden</h1>
+   <p class="muted">Die Verwaltung speichert direkt in euer GitHub-Repository. Dafür braucht diese Seite einmalig einen Zugangsschlüssel (Token). Er bleibt nur in diesem Browser gespeichert.</p>
+   <div class="card">
+    <label>Repository (Benutzername/Name)<input id="repo" placeholder="z. B. kulturscheune-fehlheim/website" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label>Zugangsschlüssel (Token)<input id="token" type="password" placeholder="github_pat_…" autocomplete="off"></label>
+    <div class="row"><button class="btn btn-primary" id="loginBtn" type="button">Anmelden</button><span id="loginMsg" class="small"></span></div>
+    <details>
+     <summary>So bekommst du einen Token</summary>
+     <ol class="small">
+      <li>Auf github.com rechts oben auf dein Profilbild → <b>Settings</b> → ganz unten <b>Developer settings</b>.</li>
+      <li><b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+      <li>Name z. B. „Raumbelegung“, Ablauf z. B. 1 Jahr.</li>
+      <li>Bei <b>Repository access</b>: <b>Only select repositories</b> und euer Website-Repository wählen.</li>
+      <li>Bei <b>Permissions</b> → <b>Contents</b> auf <b>Read and write</b> stellen.</li>
+      <li><b>Generate token</b> klicken und den Token hier einfügen.</li>
+     </ol>
+    </details>
+   </div>
+  </section>
+
+  <!-- Kalender -->
+  <section id="app" hidden>
+   <h1>raumbelegung</h1>
+   <p class="muted">Tag antippen und Status wählen. Geänderte Tage bekommen einen grünen Punkt. Zum Schluss auf „Speichern“ tippen, nach ein bis zwei Minuten ist die Website aktuell.</p>
+   <div class="card">
+    <div class="cal-head"><button id="prev" type="button" aria-label="Voriger Monat">&#8249;</button><strong id="mon" aria-live="polite"></strong><button id="next" type="button" aria-label="Nächster Monat">&#8250;</button></div>
+    <div class="grid" id="grid"></div>
+    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i style="border:1px solid var(--line)"></i>frei</span></div>
+   </div>
+   <p class="small muted" style="margin-top:14px">Angemeldet für <b id="repoName"></b> · <a href="#" id="logout">Abmelden</a></p>
+  </section>
+
+ </div>
+</main>
+
+<div class="bar" id="bar" hidden>
+ <div class="wrap">
+  <span id="msg">Keine Änderungen</span>
+  <div class="row"><button class="btn btn-ghost" id="undo" type="button" disabled>Verwerfen</button><button class="btn btn-primary" id="save" type="button" disabled>Speichern</button></div>
+ </div>
+</div>
+
+<dialog id="dlg">
+ <h2 id="dlgTitle"></h2>
+ <div class="choices">
+  <button class="choice" type="button" data-s="frei"><i style="border:2px solid var(--line)"></i>Nicht belegt</button>
+  <button class="choice" type="button" data-s="angefragt"><i style="background:var(--orange)"></i>Angefragt</button>
+  <button class="choice" type="button" data-s="belegt"><i style="background:var(--busy)"></i>Belegt</button>
+ </div>
+ <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="dlgClose">Abbrechen</button></div>
+</dialog>
+
+<script>
+(function(){
+var DATEI="daten/raumbelegung.json";
+var M=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var $=function(id){return document.getElementById(id)};
+function speicher(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
+
+var repo=speicher("kf_repo")||"",token=speicher("kf_token")||"";
+var original={},tage={},sha=null;  // tage: {"2026-11-28":"belegt"}
+var now=new Date(),y=now.getFullYear(),m=now.getMonth();
+var heute=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+var aktuellerTag=null;
+
+function iso(a,b,c){return a+"-"+String(b+1).padStart(2,"0")+"-"+String(c).padStart(2,"0")}
+function plus1(s){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)}
+function b64decode(s){var bin=atob(s.replace(/\n/g,""));var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
+function b64encode(s){var bytes=new TextEncoder().encode(s),bin="";bytes.forEach(function(b){bin+=String.fromCharCode(b)});return btoa(bin)}
+
+function api(method,body){
+ return fetch("https://api.github.com/repos/"+repo+"/contents/"+DATEI,{
+  method:method,cache:"no-store",
+  headers:{"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"},
+  body:body?JSON.stringify(body):undefined
+ }).then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok){var e=new Error(j.message||("Fehler "+r.status));e.status=r.status;throw e}return j})});
+}
+
+// Liste <-> Tage
+function ausListe(liste){
+ var t={};(liste||[]).forEach(function(e){if(!e||!e.von)return;var bis=e.bis||e.von,d=e.von,n=0;while(d<=bis&&n<400){t[d]=e.status==="angefragt"?"angefragt":"belegt";d=plus1(d);n++}});return t;
+}
+function zuListe(t){
+ var keys=Object.keys(t).sort(),out=[];
+ keys.forEach(function(k){var last=out[out.length-1];if(last&&last.status===t[k]&&plus1(last.bis)===k){last.bis=k}else out.push({von:k,bis:k,status:t[k]})});
+ return out;
+}
+
+function laden(){
+ $("msg").textContent="Lade …";$("msg").className="";
+ return api("GET").then(function(j){
+  sha=j.sha;var liste=JSON.parse(b64decode(j.content||"")||"[]");
+  original=ausListe(liste);tage=Object.assign({},original);zeichne();status();
+ });
+}
+
+function geaendert(){var n=0,keys={};Object.keys(original).concat(Object.keys(tage)).forEach(function(k){keys[k]=1});Object.keys(keys).forEach(function(k){if((original[k]||"frei")!==(tage[k]||"frei"))n++});return n}
+function status(text,cls){
+ var n=geaendert();$("save").disabled=!n;$("undo").disabled=!n;
+ $("msg").className=cls||"";$("msg").textContent=text||(n?n+(n===1?" Tag geändert":" Tage geändert"):"Keine Änderungen");
+}
+
+function zeichne(){
+ $("mon").textContent=M[m]+" "+y;var g=$("grid");g.innerHTML="";
+ ["Mo","Di","Mi","Do","Fr","Sa","So"].forEach(function(t){var s=document.createElement("span");s.className="dow";s.textContent=t;g.appendChild(s)});
+ var first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+ for(var i=0;i<first;i++)g.appendChild(document.createElement("span"));
+ for(var d=1;d<=days;d++){
+  var s=iso(y,m,d),st=tage[s]||"frei",b=document.createElement("button");
+  b.type="button";b.className="day"+(st!=="frei"?" "+st:"")+(s<heute?" past":"")+(s===heute?" today":"")+((original[s]||"frei")!==st?" changed":"");
+  b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st));
+  (function(s){b.onclick=function(){oeffne(s)}})(s);g.appendChild(b);
+ }
+}
+
+function oeffne(s){
+ aktuellerTag=s;var d=new Date(s+"T12:00:00");
+ $("dlgTitle").textContent=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ document.querySelectorAll(".choice").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.s===(tage[s]||"frei"))});
+ $("dlg").showModal();
+}
+document.querySelectorAll(".choice").forEach(function(c){c.onclick=function(){
+ if(c.dataset.s==="frei")delete tage[aktuellerTag];else tage[aktuellerTag]=c.dataset.s;
+ $("dlg").close();zeichne();status();
+}});
+$("dlgClose").onclick=function(){$("dlg").close()};
+$("prev").onclick=function(){m--;if(m<0){m=11;y--}zeichne()};
+$("next").onclick=function(){m++;if(m>11){m=0;y++}zeichne()};
+$("undo").onclick=function(){tage=Object.assign({},original);zeichne();status()};
+
+$("save").onclick=function(){
+ var n=geaendert();$("save").disabled=true;status("Speichere …");
+ var inhalt=JSON.stringify(zuListe(tage),null,2)+"\n";
+ api("PUT",{message:"Raumbelegung aktualisiert ("+n+(n===1?" Tag":" Tage")+")",content:b64encode(inhalt),sha:sha}).then(function(j){
+  sha=j.content&&j.content.sha;original=Object.assign({},tage);zeichne();
+  status("Gespeichert. Die Website ist in ein bis zwei Minuten aktuell.","ok");
+ }).catch(function(e){
+  if(e.status===409||e.status===422){status("Die Belegung wurde inzwischen woanders geändert. Bitte Seite neu laden und noch einmal eintragen.","err")}
+  else status("Speichern fehlgeschlagen: "+e.message,"err");
+  $("save").disabled=false;
+ });
+};
+window.addEventListener("beforeunload",function(e){if(geaendert()){e.preventDefault();e.returnValue=""}});
+
+function zeigeApp(){
+ $("login").hidden=true;$("app").hidden=false;$("bar").hidden=false;$("repoName").textContent=repo;
+ laden().catch(function(e){
+  if(e.status===401||e.status===403||e.status===404){speicher("kf_token",null);token="";zeigeLogin("Anmeldung fehlgeschlagen ("+e.message+"). Bitte Repository und Token prüfen.")}
+  else status("Laden fehlgeschlagen: "+e.message,"err");
+ });
+}
+function zeigeLogin(fehler){
+ $("app").hidden=true;$("bar").hidden=true;$("login").hidden=false;$("repo").value=repo;
+ $("loginMsg").textContent=fehler||"";$("loginMsg").style.color=fehler?"var(--err)":"";
+}
+$("loginBtn").onclick=function(){
+ repo=$("repo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,"");token=$("token").value.trim();
+ if(!/^[^\/\s]+\/[^\/\s]+$/.test(repo)||!token){zeigeLogin("Bitte Repository im Format Benutzername/Name und den Token eintragen.");return}
+ speicher("kf_repo",repo);speicher("kf_token",token);zeigeApp();
+};
+$("logout").onclick=function(e){e.preventDefault();if(geaendert()&&!confirm("Ungespeicherte Änderungen verwerfen?"))return;speicher("kf_token",null);token="";original={};tage={};zeigeLogin()};
+
+if(repo&&token)zeigeApp();else zeigeLogin();
+})();
+</script>
+</body>
+</html>
