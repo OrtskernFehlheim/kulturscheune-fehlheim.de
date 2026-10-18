@@ -1,0 +1,17 @@
+{
+  "titel": "Weihnachtsbaum: Licht an",
+  "datum": "2026-11-28",
+  "kategorie": "automatisch",
+  "flyer": "/flyer/2026-11-28-licht-an.jpg",
+  "programm": [
+    {
+      "zeit": "16 Uhr",
+      "text": "Kinderprogramm"
+    },
+    {
+      "zeit": "19 Uhr",
+      "text": "Glühwein, Häppchen, Feuer & Musik"
+    }
+  ],
+  "hinweis": "Bitte Tasse & Spende mitbringen!"
+}

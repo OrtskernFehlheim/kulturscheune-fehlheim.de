@@ -1,32 +1,5 @@
-[
-  {
-    "titel": "Weihnachtsbaum: Licht an",
-    "datum": "2025-11-29",
-    "flyer": "/flyer/2025-11-29-licht-an.jpg",
-    "programm": [],
-    "hinweis": ""
-  },
-  {
-    "titel": "Nora Peters: Fotografie",
-    "datum": "2026-05-09",
-    "flyer": "/flyer/2026-05-09-nora-peters.jpg",
-    "programm": [],
-    "hinweis": ""
-  },
-  {
-    "titel": "Weihnachtsbaum: Licht an",
-    "datum": "2026-11-28",
-    "flyer": "/flyer/2026-11-28-licht-an.jpg",
-    "programm": [
-      {
-        "zeit": "16 Uhr",
-        "text": "Kinderprogramm"
-      },
-      {
-        "zeit": "19 Uhr",
-        "text": "Glühwein, Häppchen, Feuer & Musik"
-      }
-    ],
-    "hinweis": "Bitte Tasse & Spende mitbringen!"
-  }
-]
+---
+# Diese Datei wird von GitHub automatisch aus dem Ordner _data/veranstaltungen gefüllt.
+# Bitte nicht von Hand bearbeiten, Veranstaltungen pflegt ihr in Pages CMS.
+---
+{{ site.data.veranstaltungen | jsonify }}

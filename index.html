@@ -315,8 +315,10 @@ mb.onclick=function(){var o=top.classList.toggle("open");mb.setAttribute("aria-e
 document.querySelectorAll("#menu a").forEach(function(a){a.onclick=function(){top.classList.remove("open");mb.setAttribute("aria-expanded","false");mb.textContent="menü";document.body.style.overflow=""}});
 
 function zeigeVeranstaltungen(EVENTS){
-var kommt=EVENTS.filter(function(e){return e.datum>=heute}).sort(function(a,b){return a.datum<b.datum?-1:1});
-var war=EVENTS.filter(function(e){return e.datum<heute}).sort(function(a,b){return a.datum<b.datum?1:-1});
+function istKommend(e){var k=e.kategorie||"automatisch";return k==="naechste"||(k==="automatisch"&&e.datum>=heute)}
+function istVorbei(e){var k=e.kategorie||"automatisch";return k==="rueckblick"||(k==="automatisch"&&e.datum<heute)}
+var kommt=EVENTS.filter(istKommend).sort(function(a,b){return a.datum<b.datum?-1:1});
+var war=EVENTS.filter(istVorbei).sort(function(a,b){return a.datum<b.datum?1:-1});
 var nc=document.getElementById("nextCard");
 if(kommt.length){
  var e=kommt[0],d=dt(e.datum);
@@ -381,6 +383,7 @@ function bild(p){return (p||"").replace(/^\//,"")}
 function laden(datei){return fetch(datei,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(datei);return r.json()})}
 draw();
 laden("daten/veranstaltungen.json").then(function(liste){
+ if(liste&&!Array.isArray(liste))liste=Object.keys(liste).map(function(k){return liste[k]});
  zeigeVeranstaltungen((liste||[]).filter(function(e){return e&&e.datum&&e.titel}).map(function(e){e.bild=bild(e.flyer);return e}));
 }).catch(function(){document.getElementById("kommt").appendChild(el("p","empty","Das Programm konnte gerade nicht geladen werden. Bitte die Seite neu laden."))});
 laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter(function(t){return t&&t.von});draw()}).catch(function(){});
