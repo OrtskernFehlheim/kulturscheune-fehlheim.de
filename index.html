@@ -339,7 +339,6 @@ if(kommt.length){
 function kachel(e){
  var b=el("button","tile");b.type="button";b.onclick=function(){zeige(e)};
  var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;im.loading="lazy";b.appendChild(im);
- b.appendChild(el("span","chip",kurz(e.datum)));
  var c=el("span","cap");c.appendChild(el("b",null,e.titel));c.appendChild(el("span",null,lang(e.datum)));b.appendChild(c);
  return b;
 }
