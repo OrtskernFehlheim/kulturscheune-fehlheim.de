@@ -1,0 +1,17 @@
+{
+  "titel": "Gründungskonzert ",
+  "datum": "2027-04-20",
+  "kategorie": "automatisch",
+  "flyer": "/flyer/kulturscheune logo.png",
+  "programm": [
+    {
+      "zeit": "16:00",
+      "text": "Eröffnungsrede"
+    },
+    {
+      "zeit": "18:00",
+      "text": "Konzert"
+    }
+  ],
+  "hinweis": "Bringt Bier mit"
+}
