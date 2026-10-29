@@ -63,6 +63,13 @@ dialog h2{font-size:1.4rem;margin-bottom:14px}
 .choice i{width:18px;height:18px;border-radius:5px;flex:none}
 .choice[aria-pressed="true"]{border-color:var(--ink)}
 .small{font-size:.86rem}
+.grid button.hasnote::before{content:"";position:absolute;bottom:6px;left:50%;width:14px;height:3px;margin-left:-7px;border-radius:2px;background:currentColor;opacity:.7}
+textarea{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%;resize:vertical;min-height:84px}
+.notes{list-style:none;padding:0;margin:0}
+.notes li{display:grid;grid-template-columns:5.2em 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:.94rem}
+.notes li b{font-variant-numeric:tabular-nums}
+.notes button{all:unset;cursor:pointer;display:contents}
+.hint{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.86rem;color:var(--muted);margin-top:12px}
 details{margin-top:10px}
 summary{cursor:pointer;font-weight:600}
 ol{padding-left:1.2em;margin:.6em 0}
@@ -83,6 +90,7 @@ li{margin-bottom:.4em}
    <div class="card">
     <label>Repository (Benutzername/Name)<input id="repo" placeholder="z. B. kulturscheune-fehlheim/website" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>Zugangsschlüssel (Token)<input id="token" type="password" placeholder="github_pat_…" autocomplete="off"></label>
+    <label>Privates Repository für interne Notizen (optional)<input id="repoIntern" placeholder="z. B. OrtskernFehlheim/kulturscheune-intern" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <div class="row"><button class="btn btn-primary" id="loginBtn" type="button">Anmelden</button><span id="loginMsg" class="small"></span></div>
     <details>
      <summary>So bekommst du einen Token</summary>
@@ -90,7 +98,7 @@ li{margin-bottom:.4em}
       <li>Auf github.com rechts oben auf dein Profilbild → <b>Settings</b> → ganz unten <b>Developer settings</b>.</li>
       <li><b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
       <li>Name z. B. „Raumbelegung“, Ablauf z. B. 1 Jahr.</li>
-      <li>Bei <b>Repository access</b>: <b>Only select repositories</b> und euer Website-Repository wählen.</li>
+      <li>Bei <b>Repository access</b>: <b>Only select repositories</b> und euer Website-Repository wählen, für Notizen zusätzlich das private Repository.</li>
       <li>Bei <b>Permissions</b> → <b>Contents</b> auf <b>Read and write</b> stellen.</li>
       <li><b>Generate token</b> klicken und den Token hier einfügen.</li>
      </ol>
@@ -101,11 +109,17 @@ li{margin-bottom:.4em}
   <!-- Kalender -->
   <section id="app" hidden>
    <h1>raumbelegung</h1>
-   <p class="muted">Tag antippen und Status wählen. Geänderte Tage bekommen einen grünen Punkt. Zum Schluss auf „Speichern“ tippen, nach ein bis zwei Minuten ist die Website aktuell.</p>
+   <p class="muted">Tag antippen, Status wählen und bei Bedarf eine interne Notiz ergänzen. Geänderte Tage bekommen einen grünen Punkt, Tage mit Notiz einen Strich. Zum Schluss auf „Speichern“ tippen, nach ein bis zwei Minuten ist die Website aktuell.</p>
    <div class="card">
     <div class="cal-head"><button id="prev" type="button" aria-label="Voriger Monat">&#8249;</button><strong id="mon" aria-live="polite"></strong><button id="next" type="button" aria-label="Nächster Monat">&#8250;</button></div>
     <div class="grid" id="grid"></div>
-    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i style="border:1px solid var(--line)"></i>frei</span></div>
+    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i style="border:1px solid var(--line)"></i>frei</span><span>▁ Notiz vorhanden</span></div>
+   </div>
+   <div class="card" id="notesCard">
+    <h2 style="font-size:1.25rem;margin-bottom:6px" id="notesTitle">interne notizen</h2>
+    <ul class="notes" id="notes"></ul>
+    <p class="small muted" id="notesEmpty" style="margin:6px 0 0">Für diesen Monat gibt es keine Notizen.</p>
+    <p class="hint" id="notesOff" hidden></p>
    </div>
    <p class="small muted" style="margin-top:14px">Angemeldet für <b id="repoName"></b> · <a href="#" id="logout">Abmelden</a></p>
   </section>
@@ -122,35 +136,42 @@ li{margin-bottom:.4em}
 
 <dialog id="dlg">
  <h2 id="dlgTitle"></h2>
- <div class="choices">
-  <button class="choice" type="button" data-s="frei"><i style="border:2px solid var(--line)"></i>Nicht belegt</button>
-  <button class="choice" type="button" data-s="angefragt"><i style="background:var(--orange)"></i>Angefragt</button>
-  <button class="choice" type="button" data-s="belegt"><i style="background:var(--busy)"></i>Belegt</button>
+ <div class="choices" role="radiogroup" aria-label="Status">
+  <button class="choice" type="button" role="radio" data-s="frei"><i style="border:2px solid var(--line)"></i>Nicht belegt</button>
+  <button class="choice" type="button" role="radio" data-s="angefragt"><i style="background:var(--orange)"></i>Angefragt</button>
+  <button class="choice" type="button" role="radio" data-s="belegt"><i style="background:var(--busy)"></i>Belegt</button>
  </div>
- <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="dlgClose">Abbrechen</button></div>
+ <div id="noteBox" style="margin-top:16px">
+  <label style="margin:0">Interne Notiz <span class="muted" style="font-weight:400">(nur für den Vorstand sichtbar)</span><textarea id="noteText" placeholder="z. B. Gesangverein, Probe 19–21 Uhr, Kontakt: …"></textarea></label>
+ </div>
+ <p class="hint" id="noteOff" hidden>Notizen sind ausgeschaltet, weil kein privates Repository eingerichtet ist.</p>
+ <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="dlgClose">Abbrechen</button><button class="btn btn-primary" type="button" id="dlgOk">Übernehmen</button></div>
 </dialog>
 
 <script>
 (function(){
-var DATEI="daten/raumbelegung.json";
+var DATEI="daten/raumbelegung.json",NOTIZDATEI="raumbelegung-notizen.json";
 var M=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 var $=function(id){return document.getElementById(id)};
 function speicher(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
 
-var repo=speicher("kf_repo")||"",token=speicher("kf_token")||"";
-var original={},tage={},sha=null;  // tage: {"2026-11-28":"belegt"}
+var repo=speicher("kf_repo")||"",token=speicher("kf_token")||"",repoIntern=speicher("kf_repo_intern")||"";
+var original={},tage={},sha=null;          // öffentlich: {"2026-11-28":"belegt"}
+var notizenOrig={},notizen={},shaN=null;   // privat: {"2026-11-28":"Text"}
+var notizenAn=false;
 var now=new Date(),y=now.getFullYear(),m=now.getMonth();
 var heute=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
-var aktuellerTag=null;
+var aktuellerTag=null,dlgStatus="frei";
 
 function iso(a,b,c){return a+"-"+String(b+1).padStart(2,"0")+"-"+String(c).padStart(2,"0")}
 function plus1(s){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)}
-function b64decode(s){var bin=atob(s.replace(/\n/g,""));var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
+function kurz(s){var p=s.split("-");return p[2]+"."+p[1]+"."}
+function b64decode(s){var bin=atob((s||"").replace(/\n/g,""));var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
 function b64encode(s){var bytes=new TextEncoder().encode(s),bin="";bytes.forEach(function(b){bin+=String.fromCharCode(b)});return btoa(bin)}
 
-function api(method,body){
- return fetch("https://api.github.com/repos/"+repo+"/contents/"+DATEI,{
-  method:method,cache:"no-store",
+function gh(pfad,method,body){
+ return fetch("https://api.github.com/repos/"+pfad,{
+  method:method||"GET",cache:"no-store",
   headers:{"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"},
   body:body?JSON.stringify(body):undefined
  }).then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok){var e=new Error(j.message||("Fehler "+r.status));e.status=r.status;throw e}return j})});
@@ -166,15 +187,33 @@ function zuListe(t){
  return out;
 }
 
-function laden(){
- $("msg").textContent="Lade …";$("msg").className="";
- return api("GET").then(function(j){
-  sha=j.sha;var liste=JSON.parse(b64decode(j.content||"")||"[]");
-  original=ausListe(liste);tage=Object.assign({},original);zeichne();status();
+function ladeBelegung(){
+ return gh(repo+"/contents/"+DATEI).then(function(j){
+  sha=j.sha;original=ausListe(JSON.parse(b64decode(j.content)||"[]"));tage=Object.assign({},original);
  });
 }
+function ladeNotizen(){
+ notizenAn=false;notizenOrig={};notizen={};shaN=null;
+ if(!repoIntern){zeigeNotizStatus("Interne Notizen sind noch nicht eingerichtet. Dafür braucht ihr ein privates GitHub-Repository, siehe Anleitung.");return Promise.resolve()}
+ return gh(repoIntern).then(function(info){
+  if(!info.private){zeigeNotizStatus("Das Repository „"+repoIntern+"“ ist öffentlich. Notizen werden aus Datenschutzgründen nur in einem privaten Repository gespeichert.");return}
+  return gh(repoIntern+"/contents/"+NOTIZDATEI).then(function(j){shaN=j.sha;notizenOrig=JSON.parse(b64decode(j.content)||"{}")||{}},function(e){if(e.status===404){notizenOrig={}}else throw e})
+   .then(function(){notizen=Object.assign({},notizenOrig);notizenAn=true;zeigeNotizStatus(null)});
+ }).catch(function(e){zeigeNotizStatus("Notizen konnten nicht geladen werden ("+e.message+"). Prüfe, ob der Token auch für „"+repoIntern+"“ freigegeben ist.")});
+}
+function zeigeNotizStatus(text){
+ $("notesOff").hidden=!text;$("notesOff").textContent=text||"";$("notes").hidden=!!text;$("notesEmpty").hidden=true;
+}
 
-function geaendert(){var n=0,keys={};Object.keys(original).concat(Object.keys(tage)).forEach(function(k){keys[k]=1});Object.keys(keys).forEach(function(k){if((original[k]||"frei")!==(tage[k]||"frei"))n++});return n}
+function laden(){
+ $("msg").textContent="Lade …";$("msg").className="";
+ return ladeBelegung().then(ladeNotizen).then(function(){zeichne();status()});
+}
+
+function diff(a,b,leer){var n=0,keys={};Object.keys(a).concat(Object.keys(b)).forEach(function(k){keys[k]=1});Object.keys(keys).forEach(function(k){if((a[k]||leer)!==(b[k]||leer))n++});return n}
+function geaendertBelegung(){return diff(original,tage,"frei")}
+function geaendertNotizen(){return diff(notizenOrig,notizen,"")}
+function geaendert(){var k={};[original,tage,notizenOrig,notizen].forEach(function(o){Object.keys(o).forEach(function(x){k[x]=1})});return Object.keys(k).filter(function(x){return (original[x]||"frei")!==(tage[x]||"frei")||(notizenOrig[x]||"")!==(notizen[x]||"")}).length}
 function status(text,cls){
  var n=geaendert();$("save").disabled=!n;$("undo").disabled=!n;
  $("msg").className=cls||"";$("msg").textContent=text||(n?n+(n===1?" Tag geändert":" Tage geändert"):"Keine Änderungen");
@@ -185,37 +224,57 @@ function zeichne(){
  ["Mo","Di","Mi","Do","Fr","Sa","So"].forEach(function(t){var s=document.createElement("span");s.className="dow";s.textContent=t;g.appendChild(s)});
  var first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate();
  for(var i=0;i<first;i++)g.appendChild(document.createElement("span"));
+ var liste=$("notes");liste.innerHTML="";var anzahl=0;
  for(var d=1;d<=days;d++){
-  var s=iso(y,m,d),st=tage[s]||"frei",b=document.createElement("button");
-  b.type="button";b.className="day"+(st!=="frei"?" "+st:"")+(s<heute?" past":"")+(s===heute?" today":"")+((original[s]||"frei")!==st?" changed":"");
-  b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st));
+  var s=iso(y,m,d),st=tage[s]||"frei",nz=notizen[s]||"",b=document.createElement("button");
+  var ch=(original[s]||"frei")!==st||(notizenOrig[s]||"")!==nz;
+  b.type="button";b.className="day"+(st!=="frei"?" "+st:"")+(s<heute?" past":"")+(s===heute?" today":"")+(ch?" changed":"")+(nz?" hasnote":"");
+  b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st)+(nz?", mit Notiz":""));
   (function(s){b.onclick=function(){oeffne(s)}})(s);g.appendChild(b);
+  if(nz){anzahl++;var li=document.createElement("li"),bt=document.createElement("button");bt.type="button";
+   var bb=document.createElement("b");bb.textContent=kurz(s);var sp=document.createElement("span");sp.textContent=nz;
+   bt.appendChild(bb);bt.appendChild(sp);(function(s){bt.onclick=function(){oeffne(s)}})(s);li.appendChild(bt);liste.appendChild(li)}
  }
+ $("notesTitle").textContent="interne notizen · "+M[m].toLowerCase();
+ if(notizenAn)$("notesEmpty").hidden=anzahl>0;
 }
 
+function setzeAuswahl(s){dlgStatus=s;document.querySelectorAll(".choice").forEach(function(c){var on=c.dataset.s===s;c.setAttribute("aria-pressed",on);c.setAttribute("aria-checked",on)})}
 function oeffne(s){
  aktuellerTag=s;var d=new Date(s+"T12:00:00");
  $("dlgTitle").textContent=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
- document.querySelectorAll(".choice").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.s===(tage[s]||"frei"))});
+ setzeAuswahl(tage[s]||"frei");
+ $("noteBox").hidden=!notizenAn;$("noteOff").hidden=notizenAn;$("noteText").value=notizen[s]||"";
  $("dlg").showModal();
 }
-document.querySelectorAll(".choice").forEach(function(c){c.onclick=function(){
- if(c.dataset.s==="frei")delete tage[aktuellerTag];else tage[aktuellerTag]=c.dataset.s;
+document.querySelectorAll(".choice").forEach(function(c){c.onclick=function(){setzeAuswahl(c.dataset.s)}});
+$("dlgOk").onclick=function(){
+ if(dlgStatus==="frei")delete tage[aktuellerTag];else tage[aktuellerTag]=dlgStatus;
+ if(notizenAn){var v=$("noteText").value.trim();if(v)notizen[aktuellerTag]=v;else delete notizen[aktuellerTag]}
  $("dlg").close();zeichne();status();
-}});
+};
 $("dlgClose").onclick=function(){$("dlg").close()};
 $("prev").onclick=function(){m--;if(m<0){m=11;y--}zeichne()};
 $("next").onclick=function(){m++;if(m>11){m=0;y++}zeichne()};
-$("undo").onclick=function(){tage=Object.assign({},original);zeichne();status()};
+$("undo").onclick=function(){tage=Object.assign({},original);notizen=Object.assign({},notizenOrig);zeichne();status()};
 
 $("save").onclick=function(){
- var n=geaendert();$("save").disabled=true;status("Speichere …");
- var inhalt=JSON.stringify(zuListe(tage),null,2)+"\n";
- api("PUT",{message:"Raumbelegung aktualisiert ("+n+(n===1?" Tag":" Tage")+")",content:b64encode(inhalt),sha:sha}).then(function(j){
-  sha=j.content&&j.content.sha;original=Object.assign({},tage);zeichne();
-  status("Gespeichert. Die Website ist in ein bis zwei Minuten aktuell.","ok");
+ var nB=geaendertBelegung(),nN=geaendertNotizen();$("save").disabled=true;status("Speichere …");
+ var schritte=Promise.resolve();
+ if(nB){schritte=schritte.then(function(){
+  return gh(repo+"/contents/"+DATEI,"PUT",{message:"Raumbelegung aktualisiert ("+nB+(nB===1?" Tag":" Tage")+")",content:b64encode(JSON.stringify(zuListe(tage),null,2)+"\n"),sha:sha})
+   .then(function(j){sha=j.content&&j.content.sha;original=Object.assign({},tage)});
+ })}
+ if(nN&&notizenAn){schritte=schritte.then(function(){
+  var sortiert={};Object.keys(notizen).sort().forEach(function(k){sortiert[k]=notizen[k]});
+  var body={message:"Interne Notizen aktualisiert ("+nN+(nN===1?" Tag":" Tage")+")",content:b64encode(JSON.stringify(sortiert,null,2)+"\n")};if(shaN)body.sha=shaN;
+  return gh(repoIntern+"/contents/"+NOTIZDATEI,"PUT",body).then(function(j){shaN=j.content&&j.content.sha;notizenOrig=Object.assign({},notizen)});
+ })}
+ schritte.then(function(){
+  zeichne();status(nB?"Gespeichert. Die Website ist in ein bis zwei Minuten aktuell.":"Notizen gespeichert.","ok");
  }).catch(function(e){
-  if(e.status===409||e.status===422){status("Die Belegung wurde inzwischen woanders geändert. Bitte Seite neu laden und noch einmal eintragen.","err")}
+  zeichne();
+  if(e.status===409||e.status===422)status("Die Daten wurden inzwischen woanders geändert. Bitte Seite neu laden und noch einmal eintragen.","err");
   else status("Speichern fehlgeschlagen: "+e.message,"err");
   $("save").disabled=false;
  });
@@ -223,22 +282,25 @@ $("save").onclick=function(){
 window.addEventListener("beforeunload",function(e){if(geaendert()){e.preventDefault();e.returnValue=""}});
 
 function zeigeApp(){
- $("login").hidden=true;$("app").hidden=false;$("bar").hidden=false;$("repoName").textContent=repo;
+ $("login").hidden=true;$("app").hidden=false;$("bar").hidden=false;$("repoName").textContent=repo+(repoIntern?" (Notizen: "+repoIntern+")":"");
  laden().catch(function(e){
   if(e.status===401||e.status===403||e.status===404){speicher("kf_token",null);token="";zeigeLogin("Anmeldung fehlgeschlagen ("+e.message+"). Bitte Repository und Token prüfen.")}
   else status("Laden fehlgeschlagen: "+e.message,"err");
  });
 }
 function zeigeLogin(fehler){
- $("app").hidden=true;$("bar").hidden=true;$("login").hidden=false;$("repo").value=repo;
+ $("app").hidden=true;$("bar").hidden=true;$("login").hidden=false;$("repo").value=repo;$("repoIntern").value=repoIntern;
  $("loginMsg").textContent=fehler||"";$("loginMsg").style.color=fehler?"var(--err)":"";
 }
+function sauber(v){return v.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,"")}
 $("loginBtn").onclick=function(){
- repo=$("repo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,"");token=$("token").value.trim();
+ repo=sauber($("repo").value);repoIntern=sauber($("repoIntern").value);token=$("token").value.trim();
  if(!/^[^\/\s]+\/[^\/\s]+$/.test(repo)||!token){zeigeLogin("Bitte Repository im Format Benutzername/Name und den Token eintragen.");return}
- speicher("kf_repo",repo);speicher("kf_token",token);zeigeApp();
+ if(repoIntern&&!/^[^\/\s]+\/[^\/\s]+$/.test(repoIntern)){zeigeLogin("Das private Repository bitte ebenfalls im Format Benutzername/Name eintragen.");return}
+ if(repoIntern&&repoIntern.toLowerCase()===repo.toLowerCase()){zeigeLogin("Für Notizen bitte ein eigenes, privates Repository verwenden, nicht das der Website.");return}
+ speicher("kf_repo",repo);speicher("kf_repo_intern",repoIntern||null);speicher("kf_token",token);zeigeApp();
 };
-$("logout").onclick=function(e){e.preventDefault();if(geaendert()&&!confirm("Ungespeicherte Änderungen verwerfen?"))return;speicher("kf_token",null);token="";original={};tage={};zeigeLogin()};
+$("logout").onclick=function(e){e.preventDefault();if(geaendert()&&!confirm("Ungespeicherte Änderungen verwerfen?"))return;speicher("kf_token",null);token="";original={};tage={};notizen={};notizenOrig={};zeigeLogin()};
 
 if(repo&&token)zeigeApp();else zeigeLogin();
 })();
