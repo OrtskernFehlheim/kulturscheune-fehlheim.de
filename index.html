@@ -140,12 +140,13 @@ input,textarea{font:inherit;font-weight:400;padding:12px 14px;border:1px solid v
 
 /* Footer */
 footer{background:var(--petrol);color:var(--on-petrol);padding:56px 0 32px;font-size:.95rem}
-footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
+footer .cols{display:grid;grid-template-columns:1.4fr .7fr 1fr 1fr;gap:32px}
 footer h3{font-size:1.15rem;margin-bottom:.6em}
 footer a{text-underline-offset:3px}
 footer .legal{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);opacity:.75;font-size:.85rem}
 footer .mail{color:inherit}
-footer .social{display:inline-flex;align-items:center;gap:10px;margin-top:14px;text-decoration:none}
+footer .mail{display:inline-block}
+footer .social{display:flex;width:max-content;align-items:center;gap:10px;text-decoration:none}
 footer .social span{text-decoration:underline;text-underline-offset:3px}
 footer .social img{width:36px;height:36px;display:block;transition:opacity .15s}
 footer .social.has-icon span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -288,8 +289,8 @@ dialog button{position:absolute;top:10px;right:10px;width:44px;height:44px;borde
  <div class="wrap">
   <div class="cols">
    <div><h3>kulturscheune fehlheim</h3>Ein Projekt des Ortskern Fehlheim e.V.<br>Bensheimer Str. 3A<br>64625 Fehlheim</div>
-   <div><h3>kontakt</h3><a class="mail" href="mailto:info@kulturscheune-fehlheim.de">info@kulturscheune-fehlheim.de</a>
-    <a class="social" href="https://www.instagram.com/kulturscheune_fehlheim/" target="_blank" rel="noopener noreferrer" title="Kulturscheune Fehlheim auf Instagram" aria-label="Kulturscheune Fehlheim auf Instagram (öffnet in neuem Tab)"><img src="bilder/Instagram_Glyph_White.png" alt="Instagram" width="36" height="36" onload="this.parentNode.classList.add('has-icon')" onerror="this.remove()"><span>@kulturscheune_fehlheim</span></a></div>
+   <div><h3>folgt uns</h3><a class="social" href="https://www.instagram.com/kulturscheune_fehlheim/" target="_blank" rel="noopener noreferrer" title="Kulturscheune Fehlheim auf Instagram" aria-label="Kulturscheune Fehlheim auf Instagram (öffnet in neuem Tab)"><img src="bilder/Instagram_Glyph_White.png" alt="Instagram" width="36" height="36" onload="this.parentNode.classList.add('has-icon')" onerror="this.remove()"><span>@kulturscheune_fehlheim</span></a></div>
+   <div><h3>kontakt</h3><a class="mail" href="mailto:info@kulturscheune-fehlheim.de">info@kulturscheune-fehlheim.de</a></div>
    <div><h3>rechtliches</h3><a href="impressum.html">Impressum</a><br><a href="datenschutz.html">Datenschutz</a><br><a href="satzung.html">Satzung</a></div>
   </div>
   <div class="legal">© Ortskern Fehlheim e.V.</div>
