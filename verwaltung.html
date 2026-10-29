@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Raumbelegung verwalten – Kulturscheune Fehlheim</title>
+<title>Verwaltung – Kulturscheune Fehlheim</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="favicon.ico" sizes="any">
 <meta name="theme-color" content="#08374b">
@@ -74,11 +74,36 @@ details{margin-top:10px}
 summary{cursor:pointer;font-weight:600}
 ol{padding-left:1.2em;margin:.6em 0}
 li{margin-bottom:.4em}
+.tabs{display:flex;gap:6px;background:var(--surface);padding:5px;border-radius:999px;margin-bottom:22px;width:max-content;max-width:100%}
+.tabs button{border:0;background:transparent;color:var(--ink);padding:10px 18px;border-radius:999px;cursor:pointer;font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1rem}
+.tabs button[aria-selected="true"]{background:var(--petrol);color:var(--on-petrol)}
+.evlist{display:grid;gap:10px;margin-top:16px}
+.ev{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border:0;border-radius:14px;padding:10px;color:var(--ink);cursor:pointer}
+.ev:hover{outline:2px solid var(--line)}
+.ev img,.ev .noimg{width:64px;height:64px;border-radius:8px;object-fit:cover;object-position:center top;background:var(--bg)}
+.ev b{display:block;font-family:var(--head);font-weight:800;line-height:1.2}
+.ev span{font-size:.88rem;color:var(--muted)}
+.badge{font-size:.76rem;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--bg);color:var(--muted);white-space:nowrap}
+.badge.naechste{background:var(--orange);color:var(--on-orange)}
+.badge.versteckt{text-decoration:line-through}
+.sub{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.1rem;margin:26px 0 0;color:var(--muted)}
+#evDlg{width:min(94vw,560px);max-height:92vh}
+#evDlg form{display:block}
+select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+.flyerbox{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;margin-bottom:14px}
+.flyerbox img,.flyerbox .noimg{width:120px;height:120px;border-radius:10px;object-fit:cover;object-position:center top;background:var(--bg);display:grid;place-items:center;font-size:.8rem;color:var(--muted);text-align:center}
+.prow{display:grid;grid-template-columns:7.5em 1fr 40px;gap:8px;margin-bottom:8px}
+.prow button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;cursor:pointer;font-size:1.1rem}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.check input{width:20px;height:20px;margin-top:2px;flex:none}
+.danger{background:transparent;border-color:var(--err);color:var(--err)}
+#evMsg{font-size:.9rem;margin-top:10px}
+#evMsg.err{color:var(--err)}#evMsg.ok{color:var(--ok)}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<header><div class="wrap"><span class="head" style="font-size:1.15rem">raumbelegung</span><a href="index.html">Zur Website</a></div></header>
+<header><div class="wrap"><span class="head" style="font-size:1.15rem">verwaltung</span><a href="index.html">Zur Website</a></div></header>
 
 <main>
  <div class="wrap">
@@ -104,6 +129,23 @@ li{margin-bottom:.4em}
      </ol>
     </details>
    </div>
+  </section>
+
+  <div class="tabs" id="tabs" role="tablist" hidden>
+   <button type="button" role="tab" aria-selected="true" data-tab="app">raumbelegung</button>
+   <button type="button" role="tab" aria-selected="false" data-tab="events">veranstaltungen</button>
+  </div>
+
+  <!-- Veranstaltungen -->
+  <section id="events" hidden>
+   <h1>veranstaltungen</h1>
+   <p class="muted">Neue Veranstaltung anlegen oder eine bestehende antippen, um sie zu bearbeiten. Nach dem Speichern ist die Website in ein bis zwei Minuten aktuell.</p>
+   <button class="btn btn-primary" type="button" id="evNew">+ Neue Veranstaltung</button>
+   <p class="small muted" id="evStatus" style="margin-top:14px"></p>
+   <h2 class="sub" id="evKommtH" hidden>kommend</h2>
+   <div class="evlist" id="evKommt"></div>
+   <h2 class="sub" id="evWarH" hidden>vergangen</h2>
+   <div class="evlist" id="evWar"></div>
   </section>
 
   <!-- Kalender -->
@@ -146,6 +188,37 @@ li{margin-bottom:.4em}
  </div>
  <p class="hint" id="noteOff" hidden>Notizen sind ausgeschaltet, weil kein privates Repository eingerichtet ist.</p>
  <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="dlgClose">Abbrechen</button><button class="btn btn-primary" type="button" id="dlgOk">Übernehmen</button></div>
+</dialog>
+
+<dialog id="evDlg">
+ <form method="dialog" id="evForm" novalidate>
+  <h2 id="evTitle">neue veranstaltung</h2>
+  <label>Titel<input id="evTitel" required placeholder="z. B. Lesung für Kinder"></label>
+  <label>Datum<input id="evDatum" type="date" required></label>
+  <label>Wo soll die Veranstaltung erscheinen?
+   <select id="evKat">
+    <option value="automatisch">Automatisch nach Datum (empfohlen)</option>
+    <option value="naechste">Nächste Veranstaltungen</option>
+    <option value="rueckblick">Rückblick</option>
+    <option value="versteckt">Nicht anzeigen</option>
+   </select>
+  </label>
+  <div style="font-weight:600;font-size:.92rem;margin-bottom:6px">Flyer</div>
+  <div class="flyerbox">
+   <div id="evPrev"><div class="noimg">kein Flyer</div></div>
+   <div><input type="file" id="evFile" accept="image/jpeg,image/png,image/webp"><p class="small muted" style="margin:6px 0 0">Am besten quadratisch, ca. 1080 × 1080 Pixel. Das Bild wird beim Hochladen automatisch verkleinert.</p></div>
+  </div>
+  <div style="font-weight:600;font-size:.92rem;margin-bottom:6px">Ablauf <span class="muted" style="font-weight:400">(optional)</span></div>
+  <div id="evProg"></div>
+  <button class="btn btn-ghost" type="button" id="evAddRow" style="padding:8px 14px;margin-bottom:14px">+ Zeile</button>
+  <label>Hinweis <span class="muted" style="font-weight:400">(optional)</span><input id="evHinweis" placeholder="z. B. Bitte Tasse mitbringen!"></label>
+  <label class="check" id="evBelegtBox"><input type="checkbox" id="evBelegt" checked><span>Diesen Tag im Raumkalender als <b>belegt</b> eintragen</span></label>
+  <p id="evMsg"></p>
+  <div class="row" style="justify-content:space-between;margin-top:8px">
+   <button class="btn danger" type="button" id="evDel" hidden>Löschen</button>
+   <div class="row" style="margin-left:auto"><button class="btn btn-ghost" type="button" id="evCancel">Abbrechen</button><button class="btn btn-primary" type="button" id="evSave">Speichern</button></div>
+  </div>
+ </form>
 </dialog>
 
 <script>
@@ -282,14 +355,16 @@ $("save").onclick=function(){
 window.addEventListener("beforeunload",function(e){if(geaendert()){e.preventDefault();e.returnValue=""}});
 
 function zeigeApp(){
- $("login").hidden=true;$("app").hidden=false;$("bar").hidden=false;$("repoName").textContent=repo+(repoIntern?" (Notizen: "+repoIntern+")":"");
+ $("login").hidden=true;$("tabs").hidden=false;$("app").hidden=false;$("events").hidden=true;$("bar").hidden=false;
+ document.querySelectorAll("#tabs button").forEach(function(x){x.setAttribute("aria-selected",x.dataset.tab==="app")});
+ setTimeout(function(){if(speicher("kf_tab")==="events")document.querySelector('#tabs [data-tab="events"]').click()},0);$("repoName").textContent=repo+(repoIntern?" (Notizen: "+repoIntern+")":"");
  laden().catch(function(e){
   if(e.status===401||e.status===403||e.status===404){speicher("kf_token",null);token="";zeigeLogin("Anmeldung fehlgeschlagen ("+e.message+"). Bitte Repository und Token prüfen.")}
   else status("Laden fehlgeschlagen: "+e.message,"err");
  });
 }
 function zeigeLogin(fehler){
- $("app").hidden=true;$("bar").hidden=true;$("login").hidden=false;$("repo").value=repo;$("repoIntern").value=repoIntern;
+ $("app").hidden=true;$("bar").hidden=true;$("tabs").hidden=true;$("events").hidden=true;$("login").hidden=false;$("repo").value=repo;$("repoIntern").value=repoIntern;
  $("loginMsg").textContent=fehler||"";$("loginMsg").style.color=fehler?"var(--err)":"";
 }
 function sauber(v){return v.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,"")}
@@ -302,7 +377,151 @@ $("loginBtn").onclick=function(){
 };
 $("logout").onclick=function(e){e.preventDefault();if(geaendert()&&!confirm("Ungespeicherte Änderungen verwerfen?"))return;speicher("kf_token",null);token="";original={};tage={};notizen={};notizenOrig={};zeigeLogin()};
 
+function markiereBelegt(datum){
+ return gh(repo+"/contents/"+DATEI).then(function(j){
+  var t=ausListe(JSON.parse(b64decode(j.content)||"[]"));
+  if(t[datum]==="belegt")return false;
+  var vorher=original[datum];t[datum]="belegt";
+  return gh(repo+"/contents/"+DATEI,"PUT",{message:"Raumbelegung: "+datum+" belegt (Veranstaltung)",content:b64encode(JSON.stringify(zuListe(t),null,2)+"\n"),sha:j.sha}).then(function(r){
+   sha=r.content&&r.content.sha;
+   Object.keys(t).forEach(function(k){if((original[k]||"frei")===(tage[k]||"frei"))tage[k]=t[k]});
+   original=t;if((tage[datum]||"frei")===(vorher||"frei"))tage[datum]="belegt";
+   zeichne();status();return true;
+  });
+ });
+}
+window.KF={gh:gh,b64encode:b64encode,b64decode:b64decode,repo:function(){return repo},heute:heute,markiereBelegt:markiereBelegt,belegt:function(d){return original[d]==="belegt"}};
+document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){
+ document.querySelectorAll("#tabs button").forEach(function(x){x.setAttribute("aria-selected",x===b)});
+ var ev=b.dataset.tab==="events";$("events").hidden=!ev;$("app").hidden=ev;$("bar").hidden=ev;
+ speicher("kf_tab",b.dataset.tab);if(ev&&window.KFEvents)window.KFEvents.laden();
+}});
+
 if(repo&&token)zeigeApp();else zeigeLogin();
+})();
+</script>
+
+<script>
+(function(){
+var K=window.KF,ORDNER="_data/veranstaltungen",FLYER="flyer";
+var $=function(id){return document.getElementById(id)};
+var M=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var KAT={automatisch:"automatisch",naechste:"fest: nächste",rueckblick:"fest: Rückblick",versteckt:"ausgeblendet"};
+var liste=[],aktuell=null,neuesBild=null,geladen=false;
+
+function slug(s){return (s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"veranstaltung"}
+function datumLang(d){return new Date(d+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"long",year:"numeric"})}
+function bildUrl(p){return (p||"").replace(/^\//,"")}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function info(text,cls){$("evStatus").textContent=text||"";$("evStatus").style.color=cls==="err"?"var(--err)":""}
+
+function laden(){
+ info("Lade Veranstaltungen …");
+ return K.gh(K.repo()+"/contents/"+ORDNER).catch(function(e){if(e.status===404)return [];throw e}).then(function(dateien){
+  dateien=(dateien||[]).filter(function(f){return f.type==="file"&&/\.json$/i.test(f.name)});
+  return Promise.all(dateien.map(function(f){return K.gh(K.repo()+"/contents/"+f.path).then(function(j){
+   var d={};try{d=JSON.parse(K.b64decode(j.content))}catch(e){}
+   return {pfad:f.path,sha:j.sha,daten:d};
+  })}));
+ }).then(function(l){liste=l;geladen=true;zeige();info(l.length?"":"Noch keine Veranstaltungen angelegt.")})
+ .catch(function(e){info("Laden fehlgeschlagen: "+e.message,"err")});
+}
+function zeige(){
+ var k=$("evKommt"),w=$("evWar");k.innerHTML="";w.innerHTML="";
+ var sort=liste.slice().sort(function(a,b){return (a.daten.datum||"")<(b.daten.datum||"")?1:-1});
+ var nk=0,nw=0;
+ sort.forEach(function(e){
+  var d=e.daten,b=el("button","ev");b.type="button";
+  var im;if(d.flyer){im=el("img");im.src=bildUrl(d.flyer)+"?v="+(e.sha||"").slice(0,7);im.alt="";im.onerror=function(){this.replaceWith(el("div","noimg"))}}else im=el("div","noimg");
+  b.appendChild(im);
+  var tx=el("div");tx.appendChild(el("b",null,d.titel||"(ohne Titel)"));tx.appendChild(el("span",null,d.datum?datumLang(d.datum):"ohne Datum"));b.appendChild(tx);
+  var kat=d.kategorie||"automatisch";b.appendChild(el("span","badge "+kat,KAT[kat]||kat));
+  b.onclick=function(){oeffne(e)};
+  if((d.datum||"")>=K.heute){k.appendChild(b);nk++}else{w.appendChild(b);nw++}
+ });
+ $("evKommtH").hidden=!nk;$("evWarH").hidden=!nw;
+}
+
+function zeile(z,t){
+ var r=el("div","prow"),a=el("input"),b=el("input"),x=el("button",null,"×");
+ a.placeholder="16 Uhr";a.value=z||"";b.placeholder="Was passiert";b.value=t||"";x.type="button";x.setAttribute("aria-label","Zeile entfernen");
+ x.onclick=function(){r.remove()};r.appendChild(a);r.appendChild(b);r.appendChild(x);$("evProg").appendChild(r);
+}
+function vorschau(src){var p=$("evPrev");p.innerHTML="";if(src){var i=el("img");i.src=src;i.alt="Flyer-Vorschau";p.appendChild(i)}else p.appendChild(el("div","noimg","kein Flyer"))}
+function meldung(t,c){$("evMsg").textContent=t||"";$("evMsg").className=c||""}
+
+function oeffne(e){
+ aktuell=e||null;neuesBild=null;$("evFile").value="";meldung("");
+ var d=(e&&e.daten)||{};
+ $("evTitle").textContent=e?"veranstaltung bearbeiten":"neue veranstaltung";
+ $("evTitel").value=d.titel||"";$("evDatum").value=d.datum||"";$("evKat").value=d.kategorie||"automatisch";$("evHinweis").value=d.hinweis||"";
+ vorschau(d.flyer?bildUrl(d.flyer):"");
+ $("evProg").innerHTML="";(d.programm||[]).forEach(function(r){zeile(r.zeit,r.text)});
+ $("evDel").hidden=!e;$("evBelegt").checked=!e;
+ aktualisiereBelegtBox();$("evSave").disabled=false;$("evDlg").showModal();
+}
+function aktualisiereBelegtBox(){var d=$("evDatum").value;var schon=d&&K.belegt(d);$("evBelegtBox").hidden=!d||schon}
+$("evDatum").addEventListener("change",aktualisiereBelegtBox);
+
+// Bild verkleinern und als JPEG vorbereiten
+$("evFile").onchange=function(){
+ var f=this.files&&this.files[0];if(!f)return;meldung("Bild wird vorbereitet …");
+ var url=URL.createObjectURL(f),img=new Image();
+ img.onload=function(){
+  var max=1600,s=Math.min(1,max/Math.max(img.width,img.height)),w=Math.round(img.width*s),h=Math.round(img.height*s);
+  var c=document.createElement("canvas");c.width=w;c.height=h;var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+  var data=c.toDataURL("image/jpeg",.86);neuesBild=data.split(",")[1];vorschau(data);URL.revokeObjectURL(url);
+  meldung("Flyer bereit ("+Math.round(neuesBild.length*.75/1024)+" KB).");
+ };
+ img.onerror=function(){meldung("Diese Datei konnte nicht als Bild gelesen werden.","err")};img.src=url;
+};
+$("evAddRow").onclick=function(){zeile("","")};
+$("evCancel").onclick=function(){$("evDlg").close()};
+
+$("evSave").onclick=function(){
+ var titel=$("evTitel").value.trim(),datum=$("evDatum").value,alt=(aktuell&&aktuell.daten)||{};
+ if(!titel||!datum){meldung("Bitte Titel und Datum eintragen.","err");return}
+ if(!neuesBild&&!alt.flyer){meldung("Bitte einen Flyer auswählen.","err");return}
+ var prog=[];$("evProg").querySelectorAll(".prow").forEach(function(r){var i=r.querySelectorAll("input");var z=i[0].value.trim(),t=i[1].value.trim();if(z||t)prog.push({zeit:z,text:t})});
+ var daten={titel:titel,datum:datum,kategorie:$("evKat").value,flyer:alt.flyer||"",programm:prog,hinweis:$("evHinweis").value.trim()};
+ var pfad=aktuell?aktuell.pfad:ORDNER+"/"+datum+"-"+slug(titel)+".json";
+ if(!aktuell&&liste.some(function(e){return e.pfad===pfad}))pfad=ORDNER+"/"+datum+"-"+slug(titel)+"-"+Date.now().toString(36).slice(-4)+".json";
+ var belegen=!$("evBelegtBox").hidden&&$("evBelegt").checked;
+ $("evSave").disabled=true;meldung("Speichere …");
+ var p=Promise.resolve();
+ if(neuesBild){var bildPfad=FLYER+"/"+datum+"-"+slug(titel)+"-"+Date.now().toString(36).slice(-4)+".jpg";
+  p=p.then(function(){return K.gh(K.repo()+"/contents/"+bildPfad,"PUT",{message:"Flyer hochgeladen: "+titel,content:neuesBild})}).then(function(){daten.flyer="/"+bildPfad});
+ }
+ p.then(function(){
+  var body={message:(aktuell?"Veranstaltung geändert: ":"Neue Veranstaltung: ")+titel+" ("+datum+")",content:K.b64encode(JSON.stringify(daten,null,2)+"\n")};
+  if(aktuell)body.sha=aktuell.sha;
+  return K.gh(K.repo()+"/contents/"+pfad,"PUT",body);
+ }).then(function(r){
+  var eintrag={pfad:pfad,sha:r.content&&r.content.sha,daten:daten};
+  if(aktuell){liste=liste.map(function(e){return e.pfad===pfad?eintrag:e})}else liste.push(eintrag);
+  return belegen?K.markiereBelegt(datum).catch(function(){meldung("Veranstaltung gespeichert, aber der Tag konnte nicht im Raumkalender eingetragen werden. Bitte dort von Hand nachtragen.","err");throw "teil"}):null;
+ }).then(function(){
+  zeige();$("evDlg").close();info("Gespeichert: „"+titel+"“. Die Website ist in ein bis zwei Minuten aktuell.");
+ }).catch(function(e){
+  if(e==="teil"){zeige();$("evSave").disabled=false;return}
+  $("evSave").disabled=false;
+  if(e.status===409||e.status===422)meldung("Diese Veranstaltung wurde inzwischen woanders geändert. Bitte schließen, kurz warten und neu öffnen.","err");
+  else meldung("Speichern fehlgeschlagen: "+(e.message||e),"err");
+ });
+};
+
+$("evDel").onclick=function(){
+ if(!aktuell)return;var d=aktuell.daten;
+ if(!confirm("„"+(d.titel||"")+"“ wirklich löschen? Tipp: Mit „Nicht anzeigen“ blendest du sie nur aus."))return;
+ meldung("Lösche …");
+ K.gh(K.repo()+"/contents/"+aktuell.pfad,"DELETE",{message:"Veranstaltung gelöscht: "+(d.titel||"")+" ("+(d.datum||"")+")",sha:aktuell.sha}).then(function(){
+  liste=liste.filter(function(e){return e!==aktuell});zeige();$("evDlg").close();info("Gelöscht. Der Flyer bleibt im Ordner „flyer“ erhalten. Ein belegter Tag im Raumkalender bleibt ebenfalls bestehen.");
+ }).catch(function(e){meldung("Löschen fehlgeschlagen: "+e.message,"err")});
+};
+$("evNew").onclick=function(){oeffne(null)};
+$("evForm").addEventListener("submit",function(e){e.preventDefault()});
+
+window.KFEvents={laden:function(){if(!geladen)return laden();zeige()}};
 })();
 </script>
 </body>
