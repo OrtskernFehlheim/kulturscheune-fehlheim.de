@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}</style>
+<script>["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault()},{passive:false})});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});</script>
 <title>Datenschutzerklärung – Kulturscheune Fehlheim</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon.png">
