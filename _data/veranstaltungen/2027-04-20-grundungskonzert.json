@@ -1,17 +1,18 @@
 {
-  "titel": "Gründungskonzert ",
-  "datum": "2027-04-20",
+  "titel": "Test",
+  "datum": "2026-11-04",
   "kategorie": "versteckt",
   "flyer": "/flyer/kulturscheune logo.png",
   "programm": [
     {
       "zeit": "16:00",
-      "text": "Eröffnungsrede"
+      "text": "Test1"
     },
     {
       "zeit": "18:00",
-      "text": "Konzert"
+      "text": "Test2"
     }
   ],
-  "hinweis": "Bringt Bier mit"
+  "hinweis": "Bitte Tests mitbringen!",
+  "fotos": []
 }
