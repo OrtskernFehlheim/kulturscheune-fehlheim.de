@@ -8,7 +8,7 @@
 .rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
 .rv.rv-l{translate:-46px 0}.rv.rv-r{translate:46px 0}.rv.rv-z{translate:0 20px;scale:.94;transition-property:opacity,translate,scale}
 .rv.oben{translate:0 -34px}.rv.rv-z.oben{translate:0 -20px}.rv.rv-l.oben{translate:-46px 0}.rv.rv-r.oben{translate:46px 0}
-.rv.sichtbar{opacity:1;translate:0 0;scale:1}
+html .rv.sichtbar.sichtbar{opacity:1;translate:0 0;scale:1} /* stärker als alle Richtungs-Klassen */
 /* Handy: nichts seitlich hereinschieben, Seite nie horizontal verschiebbar */
 main,footer{overflow-x:clip}
 @media (max-width:860px){.rv.rv-l,.rv.rv-r{translate:0 34px}.rv.rv-l.oben,.rv.rv-r.oben{translate:0 -34px}}
