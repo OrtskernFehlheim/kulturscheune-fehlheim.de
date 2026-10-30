@@ -3,7 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}</style>
+<style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}
+/* Dynamischer Aufbau beim Scrollen */
+.rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
+.rv.rv-l{translate:-46px 0}.rv.rv-r{translate:46px 0}.rv.rv-z{translate:0 20px;scale:.94;transition-property:opacity,translate,scale}
+.rv.sichtbar{opacity:1;translate:0 0;scale:1}
+.tile.rv{transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1),transform .2s;transition-delay:var(--rvd,0s),var(--rvd,0s),0s}
+h2.rv::after{content:"";display:block;height:4px;width:0;margin-top:10px;border-radius:2px;background:var(--orange);transition:width .9s cubic-bezier(.2,.7,.2,1) .35s}
+h2.rv.sichtbar::after{width:56px}
+.hero>img{will-change:transform}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1!important;translate:none!important;scale:none!important;transition:none!important}}
+</style>
 <script>["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault()},{passive:false})});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});</script>
 <title>Kulturscheune Fehlheim – Ein Projekt des Ortskern Fehlheim e.V.</title>
 <meta name="description" content="Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.">
@@ -336,7 +346,7 @@ dialog.gal::backdrop{background:transparent}
 (function(){
 // Termine und Veranstaltungen stehen in eigenen Dateien:
 //   daten/veranstaltungen.json  und  daten/raumbelegung.json
-// Am bequemsten pflegt ihr sie über Pages CMS (app.pagescms.org).
+// Gepflegt werden sie über die Verwaltungsseite (verwaltung.html).
 // Hier unten muss für neue Termine nichts geändert werden.
 var MAIL="raeume@kulturscheune-fehlheim.de";
 
@@ -546,6 +556,39 @@ laden("daten/veranstaltungen.json").then(function(liste){
  zeigeVeranstaltungen((liste||[]).filter(function(e){return e&&e.datum&&e.titel}).map(function(e){e.bild=bild(e.flyer);e.fotos=(Array.isArray(e.fotos)?e.fotos:[]).filter(Boolean).map(bild);return e}));
 }).catch(function(){document.getElementById("kommt").appendChild(el("p","empty","Das Programm konnte gerade nicht geladen werden. Bitte die Seite neu laden."))});
 laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter(function(t){return t&&t.von});draw()}).catch(function(){});
+})();
+</script>
+<script>
+// Dynamischer Aufbau beim Scrollen
+(function(){
+ if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ var REGELN=[
+  ["main section:not(.hero) h2",""],[".band .lead",""],[".band .btns",""],
+  [".next-card>*","",.12],[".past-h",""],[".tiles>.tile","rv-z",.09],
+  [".house p",""],[".facts li","rv-l",.1],[".house-art","rv-r"],
+  ["#raum>.wrap>p",""],[".steps li","",.12],[".book>div","",.15],
+  [".verein .wrap>div",""],["footer .cols>div","",.1]
+ ];
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("sichtbar");io.unobserve(e.target)}})},{rootMargin:"0px 0px -8% 0px",threshold:.12});
+ function markiere(){
+  REGELN.forEach(function(r){var n=0;document.querySelectorAll(r[0]).forEach(function(el){
+   if(el.dataset.rv)return;el.dataset.rv=1;
+   // Was beim Laden schon sichtbar ist, bleibt sofort da (kein Flackern oben auf der Seite)
+   var b=el.getBoundingClientRect();if(b.top<innerHeight*.9&&b.bottom>0&&!document.documentElement.dataset.rvBereit){return}
+   el.classList.add("rv");if(r[1])el.classList.add(r[1]);
+   if(r[2]){el.style.setProperty("--rvd",((n%4)*r[2]).toFixed(2)+"s");n++}
+   io.observe(el)})});
+ }
+ markiere();document.documentElement.dataset.rvBereit=1;
+ // Kacheln und Termine werden nachgeladen – auch die bekommen den Effekt
+ new MutationObserver(function(){markiere()}).observe(document.querySelector("main"),{childList:true,subtree:true});
+ // Leichter Parallax-Effekt für das Rathaus-Foto (nur breite Bildschirme)
+ var img=document.querySelector(".hero>img"),hero=document.querySelector(".hero"),art=document.querySelector(".house-art img"),raf=0;
+ function par(){raf=0;
+  if(innerWidth>860&&img){var y=Math.min(scrollY,hero.offsetHeight);img.style.transform="translateY("+(y*.32)+"px) scale("+(1.04+y/hero.offsetHeight*.06)+")"}else if(img)img.style.transform="";
+  if(art){var r=art.getBoundingClientRect(),m=(r.top+r.height/2-innerHeight/2)/innerHeight;art.style.transform="translateY("+(m*-36).toFixed(1)+"px) rotate("+(m*-2).toFixed(2)+"deg)"}
+ }
+ addEventListener("scroll",function(){if(!raf)raf=requestAnimationFrame(par)},{passive:true});addEventListener("resize",par);par();
 })();
 </script>
 </body>
