@@ -5,9 +5,10 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}
-/* ===== TEST: dynamischer Aufbau beim Scrollen ===== */
+/* Dynamischer Aufbau beim Scrollen */
 .rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
 .rv.rv-l{translate:-46px 0}.rv.rv-r{translate:46px 0}.rv.rv-z{translate:0 20px;scale:.94;transition-property:opacity,translate,scale}
+.rv.oben{translate:0 -34px}.rv.rv-z.oben{translate:0 -20px}.rv.rv-l.oben{translate:-46px 0}.rv.rv-r.oben{translate:46px 0}
 .rv.sichtbar{opacity:1;translate:0 0;scale:1}
 .tile.rv{transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1),transform .2s;transition-delay:var(--rvd,0s),var(--rvd,0s),0s}
 h2.rv::after{content:"";display:block;height:4px;width:0;margin-top:10px;border-radius:2px;background:var(--orange);transition:width .9s cubic-bezier(.2,.7,.2,1) .35s}
@@ -560,7 +561,7 @@ laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter
 })();
 </script>
 <script>
-// ===== TEST: dynamischer Aufbau beim Scrollen =====
+// Dynamischer Aufbau beim Scrollen
 (function(){
  if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
  var REGELN=[
@@ -570,7 +571,11 @@ laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter
   ["#raum>.wrap>p",""],[".steps li","",.12],[".book>div","",.15],
   [".verein .wrap>div",""],["footer .cols>div","",.1]
  ];
- var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("sichtbar");io.unobserve(e.target)}})},{rootMargin:"0px 0px -8% 0px",threshold:.12});
+ // TEST rückwärts: Elemente blenden aus, sobald sie ganz aus dem Bild sind, und kommen aus der passenden Richtung wieder
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){var el=e.target;
+  if(e.isIntersecting&&e.intersectionRatio>=.12){el.classList.add("sichtbar")}
+  else if(!e.isIntersecting){el.classList.remove("sichtbar");el.classList.toggle("oben",e.boundingClientRect.top<0)}
+ })},{threshold:[0,.12]});
  function markiere(){
   REGELN.forEach(function(r){var n=0;document.querySelectorAll(r[0]).forEach(function(el){
    if(el.dataset.rv)return;el.dataset.rv=1;
