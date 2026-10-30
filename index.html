@@ -87,7 +87,8 @@ section{padding:clamp(64px,10vw,120px) 0}
 .fan img{position:absolute;left:7%;top:7%;width:86%;height:86%;object-fit:cover;border-radius:8px;border:4px solid #fff;background:#fff;box-shadow:0 10px 24px -10px rgba(4,20,28,.55);transform-origin:50% 115%;transform:rotate(var(--r)) translateY(var(--y));transition:transform .45s cubic-bezier(.2,.85,.25,1.15)}
 @media (hover:none){.tile .fan img{transform:rotate(calc(var(--r) * 1.5)) translateY(var(--y))}}
 .tile:hover .fan img,.tile:focus-visible .fan img,.tile.auf .fan img,.tile.peek .fan img{transform:rotate(var(--rh)) translateY(var(--yh))}
-.tile.peek .fan img{transition-duration:.6s}
+.tile .fan img{transition-duration:.6s}
+@media (hover:hover){.tile .fan img{transition-duration:.45s}}
 .tile.auf{transform:translateY(-3px) scale(1.02);z-index:5}
 .fotobadge{position:absolute;z-index:3;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(8,55,75,.92);color:#fff;font-family:var(--head);font-weight:800;font-size:.82rem;padding:5px 10px 5px 8px;border-radius:999px}
 .fotobadge svg{width:15px;height:15px}
@@ -402,8 +403,9 @@ document.getElementById("galStage").addEventListener("click",function(ev){if(ev.
 // Fächer kurz zeigen, wenn eine Veranstaltung mit Fotos ins Bild kommt (fürs Handy)
 var KEIN_HOVER=window.matchMedia&&matchMedia("(hover: none)").matches;
 var guck=("IntersectionObserver" in window)&&!RUHIG?new IntersectionObserver(function(es){es.forEach(function(en){
- if(en.isIntersecting){var t=en.target;guck.unobserve(t);setTimeout(function(){t.classList.add("peek");setTimeout(function(){t.classList.remove("peek")},1100)},250)}
-})},{threshold:.7}):null;
+ // aufgefächert, solange die Kachel gut zu sehen ist; eingeklappt, sobald sie den Bildschirm verlässt
+ en.target.classList.toggle("peek",en.isIntersecting&&en.intersectionRatio>=.6);
+})},{threshold:[0,.6]}):null;
 var FAECHER={1:[["5deg","-2%","11deg","-9%"]],2:[["-5deg","-2%","-12deg","-8%"],["5deg","-2%","12deg","-8%"]],3:[["-6deg","-2%","-14deg","-7%"],["0deg","-4%","0deg","-16%"],["6deg","-2%","14deg","-7%"]]};
 var KAMERA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 function el(t,c,txt){var x=document.createElement(t);if(c)x.className=c;if(txt!=null)x.textContent=txt;return x}
