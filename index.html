@@ -99,7 +99,7 @@ section{padding:clamp(64px,10vw,120px) 0}
 .tile .cap{display:block;flex:1 1 auto;padding:14px 16px 16px;position:relative;z-index:2;background:var(--surface);border-radius:0 0 12px 12px}
 .tile .cap b{display:block;font-family:var(--head);font-weight:800;font-size:1.08rem;line-height:1.2}
 .tile .cap span{color:var(--muted);font-size:.92rem}
-.tiles{column-gap:56px;row-gap:44px;padding:0 20px}
+.tiles{column-gap:56px;row-gap:44px}
 .tiles.past{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));column-gap:56px;row-gap:44px;margin-top:30px}
 .tiles.past .chip{display:none}
 .past-h{margin-top:clamp(48px,7vw,80px);font-size:1.6rem;margin-bottom:.8em}
@@ -208,7 +208,7 @@ dialog.gal::backdrop{background:transparent}
 }
 @media (max-width:520px){
  .brand img{height:48px}
- .tiles{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px;padding:0 12px}
+ .tiles{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
  .tiles.past{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
  .tile .cap{padding:10px 12px 12px}
  .tile .cap b{font-size:.98rem}
