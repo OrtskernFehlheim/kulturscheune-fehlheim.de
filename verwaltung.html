@@ -59,6 +59,15 @@ button{font:inherit}
 #msg.ok{color:var(--ok)}#msg.err{color:var(--err)}
 dialog{border:0;border-radius:18px;padding:22px;background:var(--surface);color:var(--ink);width:min(92vw,380px)}
 dialog::backdrop{background:rgba(4,20,28,.6)}
+/* Dialoge: nur senkrecht scrollen, nichts seitlich verschiebbar, Seite dahinter bleibt stehen */
+dialog{max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+dialog *{max-width:100%;min-width:0}
+dialog input,dialog select,dialog textarea{display:block}
+dialog input[type=date]{-webkit-appearance:none;appearance:none;min-height:46px;text-align:left}
+dialog input[type=date]::-webkit-date-and-time-value{text-align:left}
+dialog input[type=file]{width:100%;font-size:14px!important}
+dialog input[type=checkbox]{display:inline-block}
+html:has(dialog[open]),html:has(dialog[open]) body{overflow:hidden;overscroll-behavior:none}
 dialog h2{font-size:1.4rem;margin-bottom:14px}
 .choices{display:grid;gap:10px}
 .choice{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;font-weight:600}
@@ -89,7 +98,7 @@ li{margin-bottom:.4em}
 .badge.naechste{background:var(--orange);color:var(--on-orange)}
 .badge.versteckt{text-decoration:line-through}
 .sub{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.1rem;margin:26px 0 0;color:var(--muted)}
-#evDlg{width:min(94vw,600px);max-height:92vh;overflow:auto}
+#evDlg{width:min(94vw,600px)}
 .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:8px 0 10px}
 .fitem{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--bg);border:2px solid transparent;cursor:grab}
 .fitem.drag{opacity:.4}.fitem.over{border-color:var(--orange)}
