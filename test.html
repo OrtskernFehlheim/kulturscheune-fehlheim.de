@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}
+/* ===== TEST: dynamischer Aufbau beim Scrollen ===== */
+.rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
+.rv.rv-l{translate:-46px 0}.rv.rv-r{translate:46px 0}.rv.rv-z{translate:0 20px;scale:.94;transition-property:opacity,translate,scale}
+.rv.sichtbar{opacity:1;translate:0 0;scale:1}
+.tile.rv{transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1),transform .2s;transition-delay:var(--rvd,0s),var(--rvd,0s),0s}
+h2.rv::after{content:"";display:block;height:4px;width:0;margin-top:10px;border-radius:2px;background:var(--orange);transition:width .9s cubic-bezier(.2,.7,.2,1) .35s}
+h2.rv.sichtbar::after{width:56px}
+.hero>img{will-change:transform}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1!important;translate:none!important;scale:none!important;transition:none!important}}
+</style>
+<script>["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault()},{passive:false})});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});</script>
+<title>Kulturscheune Fehlheim – Ein Projekt des Ortskern Fehlheim e.V.</title>
+<meta name="description" content="Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#08374b">
+<style>
+@font-face{font-family:"Kulturscheune Head";src:local("Avenir Next Heavy"),local("AvenirNext-Heavy");font-weight:700 900;font-display:swap}
+:root{
+ --head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;
+ --petrol:#08374b;--on-petrol:#edf1f2;
+ --bg:#eef2f3;--surface:#ffffff;--ink:#0f2530;--muted:#4f6168;--line:#d3dcdf;
+ --orange:#e8743b;--on-orange:#1b1007;--orange-text:#b04d17;
+ --busy:#08374b;--on-busy:#ffffff;--sel:#86c99c;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a22;--surface:#11262f;--ink:#e3ecef;--muted:#9db1ba;--line:#223742;--orange-text:#f08a55;--busy:#5fa8c4;--on-busy:#06202b}}
+:root[data-theme="dark"]{--bg:#0b1a22;--surface:#11262f;--ink:#e3ecef;--muted:#9db1ba;--line:#223742;--orange-text:#f08a55;--busy:#5fa8c4;--on-busy:#06202b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+h1,h2,h3,.head{font-family:var(--head);font-weight:800;text-transform:lowercase;letter-spacing:-.02em;line-height:1.02;margin:0}
+h2{font-size:clamp(2.2rem,6vw,3.6rem);margin-bottom:.45em}
+h3{font-size:1.35rem;letter-spacing:-.01em}
+p{margin:0 0 1em;max-width:60ch}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+section{padding:clamp(64px,10vw,120px) 0}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.5em;font:inherit;font-weight:700;font-size:1rem;padding:14px 24px;border-radius:999px;border:2px solid transparent;text-decoration:none;cursor:pointer;transition:background-color .15s,color .15s,border-color .15s}
+.btn-primary{background:var(--orange);color:var(--on-orange)}
+.btn-primary:hover{background:#f0864f}
+.btn-ghost{border-color:currentColor;color:inherit;background:transparent}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+
+/* Header */
+.top{position:sticky;top:0;z-index:30;background:var(--petrol);color:var(--on-petrol)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand img{height:52px;width:auto}
+.menu{display:flex;gap:30px;list-style:none;margin:0;padding:0}
+.menu a{font-family:var(--head);font-weight:800;text-transform:lowercase;text-decoration:none;font-size:1.05rem;padding:6px 0;border-bottom:2px solid transparent}
+.menu a:hover{border-color:var(--orange)}
+.menu-btn{display:none;background:none;border:2px solid var(--on-petrol);color:var(--on-petrol);border-radius:999px;font:inherit;font-family:var(--head);font-weight:800;text-transform:lowercase;padding:8px 18px;cursor:pointer}
+
+/* Hero */
+.hero{position:relative;min-height:min(74vh,700px);display:flex;align-items:flex-start;color:#fff;padding:0;overflow:hidden;background:var(--petrol)}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 35%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(165deg,rgba(8,55,75,.85) 0%,rgba(8,55,75,.5) 28%,rgba(8,55,75,0) 55%)}
+.hero .wrap{position:relative;z-index:1;width:100%;padding-top:clamp(40px,6vw,80px);padding-bottom:40px}
+.hero h1{font-size:clamp(2.6rem,6.6vw,5.4rem);line-height:.8;letter-spacing:-.035em;margin:0}
+.band{background:var(--petrol);color:var(--on-petrol);padding:30px 0}
+.band .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 48px}
+.band .lead{font-size:clamp(1.08rem,1.6vw,1.28rem);margin:0;max-width:52ch}
+.hero .by{font-size:.95rem;opacity:.8;margin-bottom:.4em}
+
+/* Als nächstes */
+.next-card{margin-top:12px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(28px,5vw,72px);align-items:center}
+.next-flyer{border:0;padding:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 18px 50px -20px rgba(8,55,75,.55)}
+.next-flyer img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center top}
+.kicker{font-family:var(--head);font-weight:800;text-transform:lowercase;color:var(--orange-text);font-size:1.1rem;margin-bottom:.6em}
+.weekday{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:clamp(1.3rem,2.4vw,1.8rem);color:var(--muted);margin:0 0 .1em}
+.bigdate{font-family:var(--head);font-weight:800;line-height:.9;letter-spacing:-.04em;font-size:clamp(3.2rem,7.4vw,6.6rem);color:var(--ink);white-space:nowrap}
+.next-card h3{font-size:clamp(1.6rem,3.4vw,2.3rem);margin:.6em 0 .5em}
+.plan{list-style:none;padding:0;margin:0 0 1.6em;border-top:1px solid var(--line)}
+.plan li{padding:10px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:5.5em 1fr;gap:12px}
+.plan b{font-family:var(--head);font-weight:800}
+.next-card .btn-ghost{color:var(--ink)}
+.next-card .btn-ghost:hover{background:var(--line)}
+
+/* Programm */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;margin-top:8px}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;height:100%;text-align:left;background:var(--surface);color:inherit;border:0;padding:0;border-radius:12px;font:inherit;cursor:zoom-in;transition:transform .2s}
+.tile:hover,.tile:focus-visible{transform:translateY(-3px);z-index:5}
+.tile .media{position:relative;display:block;width:100%;aspect-ratio:1/1;flex:none}
+@supports not (aspect-ratio:1/1){.tile .media{height:0;padding-bottom:100%}}
+.tile .media>img{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center top;border-radius:12px 12px 0 0}
+.fan{position:absolute;inset:0;z-index:1;pointer-events:none}
+.fan img{position:absolute;left:7%;top:7%;width:86%;height:86%;object-fit:cover;border-radius:8px;border:4px solid #fff;background:#fff;box-shadow:0 10px 24px -10px rgba(4,20,28,.55);transform-origin:50% 115%;transform:rotate(var(--r)) translateY(var(--y));transition:transform .45s cubic-bezier(.2,.85,.25,1.15)}
+@media (hover:none){.tile .fan img{transform:rotate(calc(var(--r) * 1.5)) translateY(var(--y))}}
+.tile:hover .fan img,.tile:focus-visible .fan img,.tile.auf .fan img{transform:rotate(var(--rh)) translateY(var(--yh))}
+/* Handy: Fächer folgt stufenlos der Scrollposition (--p von 0 = zu bis 1 = offen) */
+.tile.scroll .fan img{transform:rotate(calc(var(--r) * 1.5 + (var(--rh) - var(--r) * 1.5) * var(--p,0))) translateY(calc(var(--y) + (var(--yh) - var(--y)) * var(--p,0)));transition:transform .1s linear}
+.tile.scroll.auf .fan img{transform:rotate(var(--rh)) translateY(var(--yh));transition:transform .35s cubic-bezier(.2,.85,.25,1.15)}
+.tile.auf{transform:translateY(-3px) scale(1.02);z-index:5}
+.fotobadge{position:absolute;z-index:3;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(8,55,75,.92);color:#fff;font-family:var(--head);font-weight:800;font-size:.82rem;padding:5px 10px 5px 8px;border-radius:999px}
+.fotobadge svg{width:15px;height:15px}
+.tile .chip{position:absolute;top:12px;left:12px;background:var(--petrol);color:#fff;font-family:var(--head);font-weight:800;font-size:.9rem;padding:5px 11px;border-radius:999px}
+.tile .cap{display:block;flex:1 1 auto;padding:14px 16px 16px;position:relative;z-index:2;background:var(--surface);border-radius:0 0 12px 12px}
+.tile .cap b{display:block;font-family:var(--head);font-weight:800;font-size:1.08rem;line-height:1.2}
+.tile .cap span{color:var(--muted);font-size:.92rem}
+.tiles{column-gap:56px;row-gap:44px}
+.tiles.past{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));column-gap:56px;row-gap:44px;margin-top:30px}
+.tiles.past .chip{display:none}
+.past-h{margin-top:clamp(48px,7vw,80px);font-size:1.6rem;margin-bottom:.8em}
+.empty{color:var(--muted)}
+
+/* Haus */
+.house{background:var(--petrol);color:var(--on-petrol)}
+.house .wrap{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(32px,6vw,90px);align-items:center}
+.house p{font-size:1.12rem}
+.facts{list-style:none;padding:0;margin:1.6em 0 0;display:grid;gap:0;border-top:1px solid rgba(255,255,255,.22)}
+.facts li{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.22);display:flex;justify-content:space-between;gap:16px}
+.facts li span:first-child{opacity:.7}
+.facts li span:last-child{font-family:var(--head);font-weight:800;text-align:right}
+.house-art{position:relative}
+.house-art img{width:100%;height:auto}
+.house-photo{border-radius:14px;overflow:hidden;margin-top:28px}
+
+/* Raum */
+.steps{list-style:none;counter-reset:s;padding:0;margin:28px 0 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.steps li{counter-increment:s;padding-top:16px;border-top:3px solid var(--petrol)}
+.steps li::before{content:counter(s);display:block;font-family:var(--head);font-weight:800;font-size:2.4rem;line-height:1;color:var(--orange-text);margin-bottom:8px}
+.steps b{display:block;font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.15rem;margin-bottom:4px}
+.steps span{color:var(--muted);font-size:.95rem}
+.book{background:var(--surface);border-radius:18px;padding:clamp(20px,4vw,40px);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,56px)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head strong{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.4rem}
+.cal-head button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:1.3rem;cursor:pointer}
+.cal-head button:hover{background:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid>*{aspect-ratio:1/1;display:grid;place-items:center;border-radius:10px;font-size:.98rem;font-variant-numeric:tabular-nums}
+.grid .dow{aspect-ratio:auto;padding-bottom:4px;color:var(--muted);font-size:.8rem;font-weight:600}
+.grid button.day{font:inherit;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.grid button.day:hover{border-color:var(--ink)}
+.grid .busy{background:var(--busy);color:var(--on-busy);font-weight:600}
+.grid .ask{background:var(--orange);color:var(--on-orange);font-weight:600}
+.grid .sel{background:var(--sel)!important;border-color:var(--sel)!important;color:#06202b!important;font-weight:800}
+.grid .past{color:var(--muted);opacity:.45}
+.grid .today{box-shadow:inset 0 0 0 2px var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;font-size:.88rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:7px;vertical-align:-1px}
+.req{display:flex;flex-direction:column;gap:14px}
+.req h3{margin-bottom:4px}
+label{display:grid;gap:6px;font-size:.92rem;font-weight:600}
+input,textarea{font:inherit;font-weight:400;padding:12px 14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;width:100%}
+#d{cursor:default}
+.req .btn{align-self:flex-start;margin-top:4px}
+.small{font-size:.86rem;color:var(--muted)}
+
+/* Verein */
+.verein .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,72px);align-items:start}
+.verein p{font-size:1.15rem}
+.textlink{color:var(--orange-text);font-weight:700;text-underline-offset:4px}
+
+/* Footer */
+footer{background:var(--petrol);color:var(--on-petrol);padding:56px 0 32px;font-size:.95rem}
+footer .cols{display:grid;grid-template-columns:1.4fr .7fr 1fr 1fr;gap:32px}
+footer h3{font-size:1.15rem;margin-bottom:.6em}
+footer a{text-underline-offset:3px}
+footer .legal{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);opacity:.75;font-size:.85rem}
+footer .mail{color:inherit}
+footer .mail{display:inline-block}
+footer .social{display:flex;width:max-content;align-items:center;gap:10px;text-decoration:none}
+footer .social span{text-decoration:underline;text-underline-offset:3px}
+footer .social img{width:36px;height:36px;display:block;transition:opacity .15s}
+footer .social.has-icon span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer .social.has-icon:hover img{opacity:.8}
+footer .social:hover span{text-decoration-thickness:2px}
+
+/* Dialog */
+dialog.gal{border:0;padding:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;background:rgba(4,20,28,.96);color:#fff;display:none}
+dialog.gal[open]{display:flex;flex-direction:column}
+dialog.gal::backdrop{background:transparent}
+.gal-top{display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 8px}
+.gal-top b{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.1rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gal-top span{opacity:.75;font-size:.9rem;font-variant-numeric:tabular-nums}
+.gal-btn{width:46px;height:46px;flex:none;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer}
+.gal-btn:hover{background:rgba(255,255,255,.22)}
+.gal-stage{touch-action:none;overflow:hidden;position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 64px}
+.gal-stage img.weich{transition:scale .25s ease,translate .25s ease}.gal-stage img.gezoomt{cursor:grab}.gal-btn{position:relative;z-index:2}
+.gal-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;user-select:none;-webkit-user-drag:none}
+.gal-stage .gal-btn{position:absolute;top:50%;transform:translateY(-50%)}
+#galPrev{left:12px}#galNext{right:12px}
+.gal-thumbs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));scrollbar-width:thin}
+.gal-thumbs button{flex:none;width:64px;height:64px;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.08);cursor:pointer;opacity:.6}
+.gal-thumbs button[aria-current="true"]{border-color:var(--orange);opacity:1}
+.gal-thumbs img{width:100%;height:100%;object-fit:cover;object-position:center top}
+@media (max-width:640px){.gal-stage{padding:0 8px}.gal-stage .gal-btn{background:rgba(4,20,28,.6)}}
+
+/* Mobil */
+@media (max-width:860px){
+ .hero{flex-direction:column;align-items:stretch;min-height:0}
+ .hero>img{position:relative;order:2;height:auto;aspect-ratio:4/3;object-position:60% 40%}
+ .hero::after{display:none}
+ .hero .wrap{order:1;padding-top:36px;padding-bottom:28px}
+ .band{padding:26px 0 30px}
+ .menu-btn{display:block}
+ .menu{display:none;position:fixed;inset:72px 0 0 0;background:var(--petrol);flex-direction:column;gap:0;padding:24px 20px;margin-top:env(safe-area-inset-top,0px)}
+ .top.open .menu{display:flex}
+ .menu a{display:block;font-size:2.2rem;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.15)}
+ .next-card,.house .wrap,.book,.verein .wrap{grid-template-columns:1fr}
+ .house-art{order:-1;max-width:420px}
+ .steps{grid-template-columns:1fr;gap:14px;margin-bottom:28px}
+ .steps li{display:grid;grid-template-columns:2.4rem 1fr;column-gap:12px}
+ .steps li::before{grid-row:span 2;margin:0}
+ footer .cols{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+ .brand img{height:48px}
+ .tiles{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
+ .tiles.past{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
+ .tile .cap{padding:10px 12px 12px}
+ .tile .cap b{font-size:.98rem}
+ .grid{gap:4px}.grid>*{border-radius:8px;font-size:.9rem}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tile,.btn,.fan img{transition:none}.tile:hover{transform:none}}
+@media (prefers-reduced-motion:no-preference){.hero h1,.hero .by,.band .lead,.band .btns{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}.band .lead{animation-delay:.15s}.band .btns{animation-delay:.25s}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+ <div class="wrap">
+  <a class="brand" href="#" aria-label="Kulturscheune Fehlheim, zum Seitenanfang"><img src="bilder/logo.png" alt="Kulturscheune Fehlheim"></a>
+  <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menü</button>
+  <ul class="menu" id="menu">
+   <li><a href="#programm">programm</a></li>
+   <li><a href="#rathaus">das haus</a></li>
+   <li><a href="#raum">raum nutzen</a></li>
+   <li><a href="#verein">verein</a></li>
+   <li><a href="#kontakt">kontakt</a></li>
+  </ul>
+ </div>
+</header>
+
+<main>
+<section class="hero" aria-label="Willkommen">
+ <img src="bilder/rathaus.jpg" alt="Das Alte Rathaus in Fehlheim: ein Fachwerkhaus mit rotem Dach und Dachreiter">
+ <div class="wrap">
+  <p class="by">Ein Projekt des Ortskern Fehlheim e.V.</p>
+  <h1>kulturscheune<br>fehlheim</h1>
+ </div>
+</section>
+<div class="band">
+ <div class="wrap">
+  <p class="lead">Kultur und Begegnung mitten im Ort. Das Alte Rathaus öffnet seine Türen für alle in Fehlheim und für die Vereine, die hier zu Hause sind.</p>
+  <div class="btns"><a class="btn btn-primary" href="#programm">Programm ansehen</a><a class="btn btn-ghost" href="#raum">Raum anfragen</a></div>
+ </div>
+</div>
+
+<section id="programm" aria-labelledby="prog-h">
+ <div class="wrap">
+  <h2 id="prog-h">programm</h2>
+  <div class="next-card" id="nextCard"></div>
+  <h3 class="past-h" id="moreh" hidden>weitere termine</h3>
+  <div class="tiles" id="kommt"></div>
+  <h3 class="past-h" id="pasth" hidden>rückblick</h3>
+  <div class="tiles past" id="past"></div>
+ </div>
+</section>
+
+<section class="house" id="rathaus" aria-labelledby="haus-h">
+ <div class="wrap">
+  <div>
+   <h2 id="haus-h">das alte rathaus</h2>
+   <p>Das Alte Rathaus ist ein denkmalgeschütztes Fachwerkhaus aus dem frühen 18. Jahrhundert, erkennbar am Dachreiter mit Zwiebelhaube.</p>
+   <p>Hier entsteht ein Ort für ganz Fehlheim: mit Räumen für die Vereine im Ort und Platz für kulturelle Veranstaltungen.</p>
+   <ul class="facts">
+    <li><span>Erbaut</span><span>frühes 18. Jahrhundert</span></li>
+    <li><span>Status</span><span>Kulturdenkmal</span></li>
+    <li><span>Glocke im Dachreiter</span><span>gegossen 1742</span></li>
+   </ul>
+  </div>
+  <div class="house-art"><img src="bilder/haus.png" alt="" width="700"></div>
+ </div>
+</section>
+
+<section id="raum" aria-labelledby="raum-h">
+ <div class="wrap">
+  <h2 id="raum-h">raum für vereine</h2>
+  <p>Ihr sucht einen Raum für euer Treffen, eine Probe oder eine Veranstaltung? Im Kalender seht ihr, wann das Alte Rathaus noch frei ist.</p>
+  <ol class="steps">
+   <li><b>Tag wählen</b><span>Einen freien Tag im Kalender anklicken.</span></li>
+   <li><b>Anfrage senden</b><span>Uhrzeit und Zweck ergänzen, die E-Mail öffnet sich fertig ausgefüllt.</span></li>
+   <li><b>Bestätigung</b><span>Wir melden uns und tragen den Termin ein.</span></li>
+  </ol>
+  <div class="book">
+   <div>
+    <div class="cal-head"><button id="calPrev" type="button" aria-label="Voriger Monat">&#8249;</button><strong id="mon" aria-live="polite"></strong><button id="calNext" type="button" aria-label="Nächster Monat">&#8250;</button></div>
+    <div class="grid" id="grid"></div>
+    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i style="background:var(--sel)"></i>deine Auswahl</span></div>
+   </div>
+   <div class="req">
+    <h3>termin anfragen</h3>
+    <label>Wunschdatum<input type="text" id="d" readonly placeholder="Bitte im Kalender einen freien Tag anklicken"></label>
+    <label>Uhrzeit<input type="text" id="t" placeholder="z. B. 18:00 bis 21:00 Uhr"></label>
+    <label>Wer seid ihr und wofür?<textarea id="z" rows="4"></textarea></label>
+    <button class="btn btn-primary" id="send" type="button">E-Mail vorbereiten</button>
+    <p class="small">Der Button öffnet euer E-Mail-Programm mit einer fertigen Nachricht. Auf dieser Seite werden keine Daten gespeichert.</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="verein" id="verein" aria-labelledby="verein-h">
+ <div class="wrap">
+  <h2 id="verein-h">der verein</h2>
+  <div>
+   <p>Der Ortskern Fehlheim e.V. will Kultur in den Ort bringen und das Alte Rathaus mit Leben füllen.</p>
+   <p><a class="textlink" href="satzung.html">Unsere Satzung lesen</a></p>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer id="kontakt">
+ <div class="wrap">
+  <div class="cols">
+   <div><h3>kulturscheune fehlheim</h3>Ein Projekt des Ortskern Fehlheim e.V.<br>Bensheimer Str. 3A<br>64625 Bensheim</div>
+   <div><h3>folgt uns</h3><a class="social" href="https://www.instagram.com/kulturscheune_fehlheim/" target="_blank" rel="noopener noreferrer" title="Kulturscheune Fehlheim auf Instagram" aria-label="Kulturscheune Fehlheim auf Instagram (öffnet in neuem Tab)"><img src="bilder/Instagram_Glyph_White.png" alt="Instagram" width="36" height="36" onload="this.parentNode.classList.add('has-icon')" onerror="this.remove()"><span>@kulturscheune_fehlheim</span></a></div>
+   <div><h3>kontakt</h3><a class="mail" href="mailto:info@kulturscheune-fehlheim.de">info@kulturscheune-fehlheim.de</a></div>
+   <div><h3>rechtliches</h3><a href="impressum.html">Impressum</a><br><a href="datenschutz.html">Datenschutz</a><br><a href="satzung.html">Satzung</a></div>
+  </div>
+  <div class="legal">© Ortskern Fehlheim e.V.</div>
+ </div>
+</footer>
+
+<dialog id="dlg" class="gal" aria-label="Bildergalerie">
+ <div class="gal-top"><b id="galTitle"></b><span id="galCount" aria-live="polite"></span><button type="button" class="gal-btn" id="x" aria-label="Schließen">&#215;</button></div>
+ <div class="gal-stage" id="galStage"><button type="button" class="gal-btn" id="galPrev" aria-label="Vorheriges Bild">&#8249;</button><img id="big" alt=""><button type="button" class="gal-btn" id="galNext" aria-label="Nächstes Bild">&#8250;</button></div>
+ <div class="gal-thumbs" id="galThumbs"></div>
+</dialog>
+
+<script>
+(function(){
+// Termine und Veranstaltungen stehen in eigenen Dateien:
+//   daten/veranstaltungen.json  und  daten/raumbelegung.json
+// Gepflegt werden sie über die Verwaltungsseite (verwaltung.html).
+// Hier unten muss für neue Termine nichts geändert werden.
+var MAIL="raeume@kulturscheune-fehlheim.de";
+
+var now=new Date(),heute=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+var M=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var dlg=document.getElementById("dlg"),big=document.getElementById("big");
+function dt(d){return new Date(d+"T12:00:00")}
+function lang(d){return dt(d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+function kurz(d){var p=d.split("-");return p[2]+"."+p[1]+"."+p[0].slice(2)}
+function de(s){var p=s.split("-");return p[2]+"."+p[1]+"."+p[0]}
+var galBilder=[],galIdx=0,galEvent=null,galQuelle=null,galZu=false;
+var RUHIG=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function animiere(node,frames,opt){if(RUHIG||!node||!node.animate)return{finished:Promise.resolve()};try{return node.animate(frames,opt)}catch(e){return{finished:Promise.resolve()}}}
+function bereit(img){return img.complete&&img.naturalWidth?Promise.resolve():new Promise(function(ok){img.onload=img.onerror=function(){img.onload=img.onerror=null;ok()}})}
+function flug(von,hin,rueck){
+ // das große Bild fliegt aus der Kachel an seinen Platz bzw. zurück
+ var a=von.getBoundingClientRect(),b=hin.getBoundingClientRect();if(!a.width||!b.width)return Promise.resolve();
+ var s=Math.max(a.width/b.width,a.height/b.height),dx=(a.left+a.width/2)-(b.left+b.width/2),dy=(a.top+a.height/2)-(b.top+b.height/2);
+ var weg={transform:"translate("+dx+"px,"+dy+"px) scale("+s+")",borderRadius:"14px"},da={transform:"none",borderRadius:"8px"};
+ return animiere(hin,rueck?[da,weg]:[weg,da],{duration:rueck?360:520,easing:"cubic-bezier(.2,.8,.2,1)",fill:rueck?"forwards":"none"}).finished;
+}
+function galRand(){return[document.querySelector(".gal-top"),document.getElementById("galThumbs"),document.getElementById("galPrev"),document.getElementById("galNext")]}
+function zeige(e,start,quelle){
+ galEvent=e;galQuelle=quelle||null;galZu=false;start=start||0;
+ galBilder=[{src:e.bild,alt:"Flyer: "+e.titel}].concat((e.fotos||[]).map(function(f,i){return{src:f,alt:"Foto "+(i+1)+" von "+e.titel}}));
+ document.getElementById("galTitle").textContent=e.titel;
+ var th=document.getElementById("galThumbs");th.innerHTML="";th.hidden=galBilder.length<2;
+ document.getElementById("galPrev").hidden=document.getElementById("galNext").hidden=galBilder.length<2;
+ galBilder.forEach(function(b,i){var x=el("button");x.type="button";x.setAttribute("aria-label",b.alt);var im=el("img");im.src=b.src;im.alt="";im.loading="lazy";x.appendChild(im);x.onclick=function(){galZeige(i,i>galIdx?1:-1)};th.appendChild(x)});
+ galZeige(start,0,true);
+ if(!dlg.open)dlg.showModal();
+ animiere(dlg,[{backgroundColor:"rgba(4,20,28,0)"},{backgroundColor:"rgba(4,20,28,.96)"}],{duration:420,easing:"ease-out"});
+ galRand().forEach(function(n,k){animiere(n,[{opacity:0,transform:"translateY("+(k===1?16:k===0?-10:0)+"px)"},{opacity:1,transform:"none"}],{duration:420,delay:200,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"})});
+ big.style.opacity=RUHIG?"":"0";
+ bereit(big).then(function(){
+  big.style.opacity="";
+  if(galQuelle&&start===0)flug(galQuelle,big,false);
+  else animiere(big,[{opacity:0,transform:"scale(.92)"},{opacity:1,transform:"none"}],{duration:420,easing:"cubic-bezier(.2,.8,.2,1)"});
+ });
+}
+function galZeige(i,richtung,still){
+ var n=galBilder.length;galIdx=(i+n)%n;var b=galBilder[galIdx];
+ zoomReset(false);big.src=b.src;big.alt=b.alt;
+ if(!still)bereit(big).then(function(){animiere(big,[{opacity:0,transform:"translateX("+((richtung||0)*60)+"px) scale(.97)"},{opacity:1,transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"})});
+ document.getElementById("galCount").textContent=n>1?(galIdx+1)+" / "+n:"";
+ var th=document.getElementById("galThumbs").children;for(var k=0;k<th.length;k++)th[k].setAttribute("aria-current",k===galIdx);
+ if(th[galIdx])th[galIdx].scrollIntoView({block:"nearest",inline:"center",behavior:RUHIG?"auto":"smooth"});
+ if(n>1){var v=new Image();v.src=galBilder[(galIdx+1)%n].src}
+}
+function galSchliessen(){
+ if(galZu||!dlg.open)return;galZu=true;zoomReset(false);
+ var fertig=[animiere(dlg,[{backgroundColor:"rgba(4,20,28,.96)"},{backgroundColor:"rgba(4,20,28,0)"}],{duration:360,easing:"ease-in",fill:"forwards"}).finished];
+ galRand().forEach(function(n){fertig.push(animiere(n,[{opacity:1},{opacity:0}],{duration:200,fill:"forwards"}).finished)});
+ var r=galQuelle&&galQuelle.getBoundingClientRect(),sichtbar=r&&r.bottom>0&&r.top<innerHeight;
+ if(galIdx===0&&sichtbar)fertig.push(flug(galQuelle,big,true));
+ else fertig.push(animiere(big,[{opacity:1,transform:"none"},{opacity:0,transform:"scale(.94)"}],{duration:260,easing:"ease-in",fill:"forwards"}).finished);
+ Promise.all(fertig).then(function(){dlg.close();[dlg,big].concat(galRand()).forEach(function(n){if(n&&n.getAnimations)n.getAnimations().forEach(function(a){a.cancel()})});galZu=false});
+}
+document.getElementById("galPrev").onclick=function(){galZeige(galIdx-1,-1)};
+document.getElementById("galNext").onclick=function(){galZeige(galIdx+1,1)};
+dlg.addEventListener("keydown",function(ev){if(ev.key==="ArrowLeft")galZeige(galIdx-1,-1);else if(ev.key==="ArrowRight")galZeige(galIdx+1,1)});
+dlg.addEventListener("cancel",function(ev){ev.preventDefault();galSchliessen()});
+document.getElementById("galStage").addEventListener("click",function(ev){if(ev.target.id==="galStage")galSchliessen()});
+// Fotos mit zwei Fingern zoomen (nur das Bild, nicht die Seite); wischen zum Blättern, Doppeltippen zoomt
+var zs=1,zx=0,zy=0;
+function zGrenzen(){var st=document.getElementById("galStage"),w=big.offsetWidth*zs,h=big.offsetHeight*zs;
+ var mx=Math.max(0,(w-st.clientWidth)/2),my=Math.max(0,(h-st.clientHeight)/2);zx=Math.max(-mx,Math.min(mx,zx));zy=Math.max(-my,Math.min(my,zy))}
+function zSetzen(weich){big.classList.toggle("weich",!!weich);big.style.scale=zs===1?"":String(zs);big.style.translate=(zx||zy)?zx+"px "+zy+"px":"";big.classList.toggle("gezoomt",zs>1)}
+function zoomReset(weich){zs=1;zx=0;zy=0;zSetzen(weich)}
+(function(){var st=document.getElementById("galStage");
+ var start=null,pinch=null,gezoomtStart=false,letzterTap=0;
+ function ab(a,b){return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}
+ function mitte(a,b){return{x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2}}
+ function mittelpunkt(){var r=big.getBoundingClientRect();return{x:r.left+r.width/2-zx,y:r.top+r.height/2-zy}}
+ st.addEventListener("touchstart",function(ev){
+  if(ev.touches.length===2){var m=mitte(ev.touches[0],ev.touches[1]);pinch={d:ab(ev.touches[0],ev.touches[1]),s:zs,m:m,x:zx,y:zy,c:mittelpunkt()};start=null;big.classList.remove("weich")}
+  else if(ev.touches.length===1){var t=ev.touches[0];start={x:t.clientX,y:t.clientY,zx:zx,zy:zy,bewegt:false};gezoomtStart=zs>1;big.classList.remove("weich")}
+ },{passive:true});
+ st.addEventListener("touchmove",function(ev){
+  if(pinch&&ev.touches.length===2){ev.preventDefault();
+   var s=Math.max(1,Math.min(5,pinch.s*ab(ev.touches[0],ev.touches[1])/pinch.d)),m=mitte(ev.touches[0],ev.touches[1]),f=s/pinch.s;
+   zx=m.x-pinch.c.x-(pinch.m.x-pinch.c.x-pinch.x)*f;zy=m.y-pinch.c.y-(pinch.m.y-pinch.c.y-pinch.y)*f;zs=s;zGrenzen();zSetzen(false)}
+  else if(start&&ev.touches.length===1){var t=ev.touches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;
+   if(Math.abs(dx)>6||Math.abs(dy)>6)start.bewegt=true;
+   if(gezoomtStart){ev.preventDefault();zx=start.zx+dx;zy=start.zy+dy;zGrenzen();zSetzen(false)}}
+ },{passive:false});
+ st.addEventListener("touchend",function(ev){
+  if(pinch){if(ev.touches.length<2){pinch=null;if(zs<1.08)zoomReset(true);start=null}return}
+  if(!start)return;var t=ev.changedTouches[0],dx=t.clientX-start.x;
+  if(!start.bewegt){var jetzt=Date.now();
+   if(jetzt-letzterTap<300&&ev.target===big){ev.preventDefault();
+    if(zs>1)zoomReset(true);else{var c=mittelpunkt();zs=2.5;zx=-(t.clientX-c.x)*1.5;zy=-(t.clientY-c.y)*1.5;zGrenzen();zSetzen(true)}letzterTap=0}
+   else letzterTap=jetzt}
+  else if(!gezoomtStart&&galBilder.length>1&&Math.abs(dx)>40)galZeige(galIdx+(dx<0?1:-1),dx<0?1:-1);
+  start=null;
+ });
+})();
+// Fächer kurz zeigen, wenn eine Veranstaltung mit Fotos ins Bild kommt (fürs Handy)
+var KEIN_HOVER=window.matchMedia&&matchMedia("(hover: none)").matches;
+var scrollKacheln=[];
+function fortschritt(){
+ // 1 = ganz aufgefächert, 0 = eingeklappt; weiche Übergänge an beiden Bildschirmrändern
+ var oben=Math.max(0,document.getElementById("top").getBoundingClientRect().bottom),unten=innerHeight;
+ scrollKacheln.forEach(function(k){
+  var r=k.m.getBoundingClientRect(),h=r.height||1;
+  var vonOben=(r.top-oben-h*.08)/(h*.9);      // eingeklappt, bevor der obere Rand oben verschwindet
+  var vonUnten=(unten-r.bottom+h*.4)/(h*.9);    // klappt auf, während die Kachel unten hereinkommt
+  var p=Math.max(0,Math.min(1,vonOben,vonUnten));p=p*p*(3-2*p);
+  if(p!==k.p&&(Math.abs(p-(k.p||0))>.002||p===0||p===1)){k.p=p;k.b.style.setProperty("--p",p.toFixed(3))}
+ });
+}
+var fRaf=0;function fPlan(){if(!fRaf)fRaf=requestAnimationFrame(function(){fRaf=0;fortschritt()})}
+if(KEIN_HOVER&&!RUHIG){addEventListener("scroll",fPlan,{passive:true});addEventListener("resize",fPlan)}
+
+var FAECHER={1:[["5deg","-2%","11deg","-9%"]],2:[["-5deg","-2%","-12deg","-8%"],["5deg","-2%","12deg","-8%"]],3:[["-6deg","-2%","-14deg","-7%"],["0deg","-4%","0deg","-16%"],["6deg","-2%","14deg","-7%"]]};
+var KAMERA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function el(t,c,txt){var x=document.createElement(t);if(c)x.className=c;if(txt!=null)x.textContent=txt;return x}
+
+// Menü
+var top=document.getElementById("top"),mb=document.getElementById("menuBtn");
+mb.onclick=function(){var o=top.classList.toggle("open");mb.setAttribute("aria-expanded",o);mb.textContent=o?"schließen":"menü";document.body.style.overflow=o?"hidden":""};
+document.querySelectorAll("#menu a").forEach(function(a){a.onclick=function(){top.classList.remove("open");mb.setAttribute("aria-expanded","false");mb.textContent="menü";document.body.style.overflow=""}});
+
+function zeigeVeranstaltungen(EVENTS){
+function istKommend(e){var k=e.kategorie||"automatisch";return k==="naechste"||(k==="automatisch"&&e.datum>=heute)}
+function istVorbei(e){var k=e.kategorie||"automatisch";return k==="rueckblick"||(k==="automatisch"&&e.datum<heute)}
+var kommt=EVENTS.filter(istKommend).sort(function(a,b){return a.datum<b.datum?-1:1});
+var war=EVENTS.filter(istVorbei).sort(function(a,b){return a.datum<b.datum?1:-1});
+var nc=document.getElementById("nextCard");
+if(kommt.length){
+ var e=kommt[0],d=dt(e.datum);
+ var fb=el("button","next-flyer");fb.type="button";fb.setAttribute("aria-label","Flyer vergrößern: "+e.titel);
+ var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;fb.appendChild(im);fb.onclick=function(){zeige(e,0,im)};
+ var info=el("div");
+ info.appendChild(el("p","kicker","als nächstes"));
+ info.appendChild(el("p","weekday",d.toLocaleDateString("de-DE",{weekday:"long"})));
+ var bd=el("div","bigdate",d.getDate()+". "+M[d.getMonth()].slice(0,3).toLowerCase()+". "+String(d.getFullYear()).slice(2));bd.setAttribute("aria-label",lang(e.datum));info.appendChild(bd);
+ info.appendChild(el("h3",null,e.titel));
+ if(e.programm&&e.programm.length){var ul=el("ul","plan");e.programm.forEach(function(r){var li=el("li");li.appendChild(el("b",null,r.zeit||""));li.appendChild(el("span",null,r.text||""));ul.appendChild(li)});info.appendChild(ul)}
+ if(e.hinweis)info.appendChild(el("p","small",e.hinweis));
+ var bt=el("div","btns");var b1=el("button","btn btn-ghost","Flyer ansehen");b1.type="button";b1.onclick=function(){zeige(e,0,im)};bt.appendChild(b1);info.appendChild(bt);
+ nc.appendChild(fb);nc.appendChild(info);
+}else{
+ nc.hidden=true;
+}
+function kachel(e){
+ var b=el("button","tile");b.type="button";
+ var fotos=e.fotos||[],media=el("span","media");
+ if(fotos.length){
+  var fan=el("span","fan"),auswahl=fotos.slice(0,3),cfg=FAECHER[auswahl.length];
+  auswahl.forEach(function(src,i){var f=el("img");f.src=src;f.alt="";f.loading="lazy";var c=cfg[i];f.style.setProperty("--r",c[0]);f.style.setProperty("--y",c[1]);f.style.setProperty("--rh",c[2]);f.style.setProperty("--yh",c[3]);fan.appendChild(f)});
+  media.appendChild(fan);
+  b.setAttribute("aria-label",e.titel+", "+lang(e.datum)+": Flyer und "+fotos.length+(fotos.length===1?" Foto":" Fotos")+" ansehen");
+ }
+ var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;im.loading="lazy";media.appendChild(im);
+ if(fotos.length){var bd=el("span","fotobadge");bd.innerHTML=KAMERA;bd.appendChild(document.createTextNode(fotos.length+(fotos.length===1?" foto":" fotos")));media.appendChild(bd)}
+ b.appendChild(media);
+ b.onclick=function(){
+  if(fotos.length&&!RUHIG){b.classList.add("auf");setTimeout(function(){zeige(e,0,im)},KEIN_HOVER?420:200);setTimeout(function(){b.classList.remove("auf")},1300)}
+  else zeige(e,0,im);
+ };
+ if(fotos.length&&KEIN_HOVER&&!RUHIG){b.classList.add("scroll");scrollKacheln.push({b:b,m:media});fPlan()}
+ var c=el("span","cap");c.appendChild(el("b",null,e.titel));c.appendChild(el("span",null,lang(e.datum)));b.appendChild(c);
+ return b;
+}
+var k=document.getElementById("kommt"),rest=kommt.slice(1);
+if(rest.length){document.getElementById("moreh").hidden=false;rest.forEach(function(e){k.appendChild(kachel(e))})}
+else if(!kommt.length)k.appendChild(el("p","empty","Aktuell sind keine Termine geplant. Schaut bald wieder vorbei."));
+if(war.length){document.getElementById("pasth").hidden=false;war.forEach(function(e){document.getElementById("past").appendChild(kachel(e))})}
+}
+document.getElementById("x").onclick=galSchliessen;
+dlg.addEventListener("click",function(ev){if(ev.target===dlg)galSchliessen()});
+
+// Kalender
+var y=now.getFullYear(),m=now.getMonth(),gewaehlt="";
+var grid=document.getElementById("grid"),mon=document.getElementById("mon");
+function iso(a,b,c){return a+"-"+String(b+1).padStart(2,"0")+"-"+String(c).padStart(2,"0")}
+var TERMINE=[];
+function status(s){var r=null;TERMINE.forEach(function(t){var bis=t.bis||t.von;if(s>=t.von&&s<=bis){if(t.status==="belegt"||!r)r=t.status}});return r}
+function draw(){
+ mon.textContent=M[m]+" "+y;grid.innerHTML="";
+ ["Mo","Di","Mi","Do","Fr","Sa","So"].forEach(function(t){grid.appendChild(el("span","dow",t))});
+ var first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+ for(var i=0;i<first;i++)grid.appendChild(el("span"));
+ for(var d=1;d<=days;d++){
+  var s=iso(y,m,d),st=status(s),e;
+  if(st){e=el("span",st==="belegt"?"busy":"ask");e.title=st;e.setAttribute("aria-label",d+". "+M[m]+", "+st)}
+  else if(s<heute){e=el("span","past")}
+  else{e=el("button","day"+(s===gewaehlt?" sel":""));e.type="button";e.setAttribute("aria-label",d+". "+M[m]+" "+y+", frei, auswählen");
+   (function(s){e.onclick=function(){gewaehlt=s;document.getElementById("d").value=de(s);draw()}})(s)}
+  e.textContent=d;if(s===heute)e.className+=" today";grid.appendChild(e);
+ }
+}
+document.getElementById("calPrev").onclick=function(){m--;if(m<0){m=11;y--}draw()};
+document.getElementById("calNext").onclick=function(){m++;if(m>11){m=0;y++}draw()};
+document.getElementById("send").onclick=function(){
+ if(!gewaehlt){alert("Bitte zuerst im Kalender einen freien Tag anklicken.");return}
+ var t=document.getElementById("t").value,z=document.getElementById("z").value;
+ var body="Hallo,\n\nwir möchten das Alte Rathaus anfragen.\n\nDatum: "+de(gewaehlt)+"\nUhrzeit: "+t+"\nWer/wofür: "+z+"\n\nViele Grüße";
+ location.href="mailto:"+MAIL+"?subject="+encodeURIComponent("Raumanfrage Altes Rathaus")+"&body="+encodeURIComponent(body);
+};
+function bild(p){return (p||"").replace(/^\//,"")}
+function laden(datei){return fetch(datei,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(datei);return r.json()})}
+draw();
+laden("daten/veranstaltungen.json").then(function(liste){
+ if(liste&&!Array.isArray(liste))liste=Object.keys(liste).map(function(k){return liste[k]});
+ zeigeVeranstaltungen((liste||[]).filter(function(e){return e&&e.datum&&e.titel}).map(function(e){e.bild=bild(e.flyer);e.fotos=(Array.isArray(e.fotos)?e.fotos:[]).filter(Boolean).map(bild);return e}));
+}).catch(function(){document.getElementById("kommt").appendChild(el("p","empty","Das Programm konnte gerade nicht geladen werden. Bitte die Seite neu laden."))});
+laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter(function(t){return t&&t.von});draw()}).catch(function(){});
+})();
+</script>
+<script>
+// ===== TEST: dynamischer Aufbau beim Scrollen =====
+(function(){
+ if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ var REGELN=[
+  ["main section:not(.hero) h2",""],[".band .lead",""],[".band .btns",""],
+  [".next-card>*","",.12],[".past-h",""],[".tiles>.tile","rv-z",.09],
+  [".house p",""],[".facts li","rv-l",.1],[".house-art","rv-r"],
+  ["#raum>.wrap>p",""],[".steps li","",.12],[".book>div","",.15],
+  [".verein .wrap>div",""],["footer .cols>div","",.1]
+ ];
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("sichtbar");io.unobserve(e.target)}})},{rootMargin:"0px 0px -8% 0px",threshold:.12});
+ function markiere(){
+  REGELN.forEach(function(r){var n=0;document.querySelectorAll(r[0]).forEach(function(el){
+   if(el.dataset.rv)return;el.dataset.rv=1;
+   // Was beim Laden schon sichtbar ist, bleibt sofort da (kein Flackern oben auf der Seite)
+   var b=el.getBoundingClientRect();if(b.top<innerHeight*.9&&b.bottom>0&&!document.documentElement.dataset.rvBereit){return}
+   el.classList.add("rv");if(r[1])el.classList.add(r[1]);
+   if(r[2]){el.style.setProperty("--rvd",((n%4)*r[2]).toFixed(2)+"s");n++}
+   io.observe(el)})});
+ }
+ markiere();document.documentElement.dataset.rvBereit=1;
+ // Kacheln und Termine werden nachgeladen – auch die bekommen den Effekt
+ new MutationObserver(function(){markiere()}).observe(document.querySelector("main"),{childList:true,subtree:true});
+ // Leichter Parallax-Effekt für das Rathaus-Foto (nur breite Bildschirme)
+ var img=document.querySelector(".hero>img"),hero=document.querySelector(".hero"),art=document.querySelector(".house-art img"),raf=0;
+ function par(){raf=0;
+  if(innerWidth>860&&img){var y=Math.min(scrollY,hero.offsetHeight);img.style.transform="translateY("+(y*.32)+"px) scale("+(1.04+y/hero.offsetHeight*.06)+")"}else if(img)img.style.transform="";
+  if(art){var r=art.getBoundingClientRect(),m=(r.top+r.height/2-innerHeight/2)/innerHeight;art.style.transform="translateY("+(m*-36).toFixed(1)+"px) rotate("+(m*-2).toFixed(2)+"deg)"}
+ }
+ addEventListener("scroll",function(){if(!raf)raf=requestAnimationFrame(par)},{passive:true});addEventListener("resize",par);par();
+})();
+</script>
+</body>
+</html>
