@@ -87,7 +87,19 @@ li{margin-bottom:.4em}
 .badge.naechste{background:var(--orange);color:var(--on-orange)}
 .badge.versteckt{text-decoration:line-through}
 .sub{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:1.1rem;margin:26px 0 0;color:var(--muted)}
-#evDlg{width:min(94vw,560px);max-height:92vh}
+#evDlg{width:min(94vw,600px);max-height:92vh;overflow:auto}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:8px 0 10px}
+.fitem{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--bg);border:2px solid transparent;cursor:grab}
+.fitem.drag{opacity:.4}.fitem.over{border-color:var(--orange)}
+.fitem img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.fitem .nr{position:absolute;top:5px;left:5px;background:rgba(8,55,75,.9);color:#fff;font-size:.72rem;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px}
+.fitem .neu{position:absolute;top:5px;right:5px;background:var(--orange);color:var(--on-orange);font-size:.66rem;font-weight:700;padding:2px 6px;border-radius:8px}
+.fitem .ctl{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:4px;background:linear-gradient(transparent,rgba(4,20,28,.75))}
+.fitem .ctl button{width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:#0f2530;font-size:1rem;line-height:1;cursor:pointer;padding:0}
+.fitem .ctl button:disabled{opacity:.35;cursor:default}
+.fitem .ctl .del{background:var(--err);color:#fff}
+.fadd{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:9px 16px}
+.fadd input{position:absolute;width:1px;height:1px;opacity:0}
 #evDlg form{display:block}
 select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
 .flyerbox{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;margin-bottom:14px}
@@ -212,6 +224,10 @@ select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--lin
   <div id="evProg"></div>
   <button class="btn btn-ghost" type="button" id="evAddRow" style="padding:8px 14px;margin-bottom:14px">+ Zeile</button>
   <label>Hinweis <span class="muted" style="font-weight:400">(optional)</span><input id="evHinweis" placeholder="z. B. Bitte Tasse mitbringen!"></label>
+  <div style="font-weight:600;font-size:.92rem;margin:4px 0 2px">Fotos <span class="muted" style="font-weight:400" id="evFotoInfo">(optional)</span></div>
+  <p class="small muted" style="margin:0">Erscheinen als Galerie hinter dem Flyer. Reihenfolge per Ziehen oder mit den Pfeilen ändern. Nur Fotos hochladen, mit denen die erkennbaren Personen einverstanden sind.</p>
+  <div class="fgrid" id="evFotos"></div>
+  <label class="btn btn-ghost fadd" style="margin-bottom:14px">+ Fotos hinzufügen<input type="file" id="evFotoFile" accept="image/jpeg,image/png,image/webp,image/heic" multiple></label>
   <label class="check" id="evBelegtBox"><input type="checkbox" id="evBelegt" checked><span>Diesen Tag im Raumkalender als <b>belegt</b> eintragen</span></label>
   <p id="evMsg"></p>
   <div class="row" style="justify-content:space-between;margin-top:8px">
@@ -407,7 +423,7 @@ var K=window.KF,ORDNER="_data/veranstaltungen",FLYER="flyer";
 var $=function(id){return document.getElementById(id)};
 var M=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 var KAT={automatisch:"automatisch",naechste:"fest: nächste",rueckblick:"fest: Rückblick",versteckt:"ausgeblendet"};
-var liste=[],aktuell=null,neuesBild=null,geladen=false;
+var liste=[],aktuell=null,neuesBild=null,geladen=false,fotos=[],entfernt=[],FOTOS="fotos";
 
 function slug(s){return (s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"veranstaltung"}
 function datumLang(d){return new Date(d+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"long",year:"numeric"})}
@@ -434,7 +450,7 @@ function zeige(){
   var d=e.daten,b=el("button","ev");b.type="button";
   var im;if(d.flyer){im=el("img");im.src=bildUrl(d.flyer)+"?v="+(e.sha||"").slice(0,7);im.alt="";im.onerror=function(){this.replaceWith(el("div","noimg"))}}else im=el("div","noimg");
   b.appendChild(im);
-  var tx=el("div");tx.appendChild(el("b",null,d.titel||"(ohne Titel)"));tx.appendChild(el("span",null,d.datum?datumLang(d.datum):"ohne Datum"));b.appendChild(tx);
+  var tx=el("div");tx.appendChild(el("b",null,d.titel||"(ohne Titel)"));var nf=(d.fotos||[]).length;tx.appendChild(el("span",null,(d.datum?datumLang(d.datum):"ohne Datum")+(nf?" · "+nf+(nf===1?" Foto":" Fotos"):"")));b.appendChild(tx);
   var kat=d.kategorie||"automatisch";b.appendChild(el("span","badge "+kat,KAT[kat]||kat));
   b.onclick=function(){oeffne(e)};
   if((d.datum||"")>=K.heute){k.appendChild(b);nk++}else{w.appendChild(b);nw++}
@@ -450,6 +466,48 @@ function zeile(z,t){
 function vorschau(src){var p=$("evPrev");p.innerHTML="";if(src){var i=el("img");i.src=src;i.alt="Flyer-Vorschau";p.appendChild(i)}else p.appendChild(el("div","noimg","kein Flyer"))}
 function meldung(t,c){$("evMsg").textContent=t||"";$("evMsg").className=c||""}
 
+// ---------- Fotos
+function verkleinere(file,max,q){
+ return new Promise(function(ok,fail){
+  var url=URL.createObjectURL(file),img=new Image();
+  img.onload=function(){var s=Math.min(1,max/Math.max(img.width,img.height)),w=Math.round(img.width*s),h=Math.round(img.height*s);
+   var c=document.createElement("canvas");c.width=w;c.height=h;var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+   URL.revokeObjectURL(url);ok(c.toDataURL("image/jpeg",q))};
+  img.onerror=function(){URL.revokeObjectURL(url);fail(new Error(file.name))};img.src=url;
+ });
+}
+var ziehIdx=null;
+function zeigeFotos(){
+ var g=$("evFotos");g.innerHTML="";
+ $("evFotoInfo").textContent=fotos.length?"("+fotos.length+(fotos.length===1?" Foto)":" Fotos)"):"(optional)";
+ fotos.forEach(function(f,i){
+  var d=el("div","fitem");d.draggable=true;
+  var im=el("img");im.src=f.vorschau||bildUrl(f.pfad);im.alt="Foto "+(i+1);d.appendChild(im);
+  d.appendChild(el("span","nr",String(i+1)));if(f.data)d.appendChild(el("span","neu","neu"));
+  var ctl=el("div","ctl");
+  var l=el("button",null,"‹");l.type="button";l.disabled=i===0;l.setAttribute("aria-label","Foto "+(i+1)+" nach vorne");l.onclick=function(){schiebe(i,i-1)};
+  var x=el("button","del","×");x.type="button";x.setAttribute("aria-label","Foto "+(i+1)+" entfernen");x.onclick=function(){if(f.pfad)entfernt.push(f.pfad);fotos.splice(i,1);zeigeFotos()};
+  var r=el("button",null,"›");r.type="button";r.disabled=i===fotos.length-1;r.setAttribute("aria-label","Foto "+(i+1)+" nach hinten");r.onclick=function(){schiebe(i,i+1)};
+  ctl.appendChild(l);ctl.appendChild(x);ctl.appendChild(r);d.appendChild(ctl);
+  d.addEventListener("dragstart",function(ev){ziehIdx=i;d.classList.add("drag");ev.dataTransfer.effectAllowed="move";try{ev.dataTransfer.setData("text/plain",String(i))}catch(e){}});
+  d.addEventListener("dragend",function(){d.classList.remove("drag");ziehIdx=null});
+  d.addEventListener("dragover",function(ev){ev.preventDefault();d.classList.add("over")});
+  d.addEventListener("dragleave",function(){d.classList.remove("over")});
+  d.addEventListener("drop",function(ev){ev.preventDefault();d.classList.remove("over");if(ziehIdx!==null&&ziehIdx!==i)schiebe(ziehIdx,i)});
+  g.appendChild(d);
+ });
+}
+function schiebe(a,b){if(b<0||b>=fotos.length)return;var f=fotos.splice(a,1)[0];fotos.splice(b,0,f);zeigeFotos()}
+$("evFotoFile").onchange=function(){
+ var files=Array.prototype.slice.call(this.files||[]);this.value="";if(!files.length)return;
+ var i=0,fehler=0;
+ (function weiter(){
+  if(i>=files.length){meldung(fehler?fehler+" Datei(en) konnten nicht gelesen werden (z. B. HEIC vom iPhone: bitte als JPEG exportieren).":files.length+(files.length===1?" Foto":" Fotos")+" hinzugefügt. Zum Hochladen auf „Speichern“ tippen.",fehler?"err":"ok");return}
+  meldung("Fotos werden vorbereitet … "+(i+1)+" von "+files.length);
+  verkleinere(files[i],1600,.82).then(function(data){fotos.push({data:data.split(",")[1],vorschau:data});zeigeFotos()},function(){fehler++}).then(function(){i++;weiter()});
+ })();
+};
+
 function oeffne(e){
  aktuell=e||null;neuesBild=null;$("evFile").value="";meldung("");
  var d=(e&&e.daten)||{};
@@ -457,6 +515,7 @@ function oeffne(e){
  $("evTitel").value=d.titel||"";$("evDatum").value=d.datum||"";$("evKat").value=d.kategorie||"automatisch";$("evHinweis").value=d.hinweis||"";
  vorschau(d.flyer?bildUrl(d.flyer):"");
  $("evProg").innerHTML="";(d.programm||[]).forEach(function(r){zeile(r.zeit,r.text)});
+ fotos=(Array.isArray(d.fotos)?d.fotos:[]).filter(Boolean).map(function(p){return{pfad:p}});entfernt=[];zeigeFotos();
  $("evDel").hidden=!e;$("evBelegt").checked=!e;
  aktualisiereBelegtBox();$("evSave").disabled=false;$("evDlg").showModal();
 }
@@ -483,7 +542,7 @@ $("evSave").onclick=function(){
  if(!titel||!datum){meldung("Bitte Titel und Datum eintragen.","err");return}
  if(!neuesBild&&!alt.flyer){meldung("Bitte einen Flyer auswählen.","err");return}
  var prog=[];$("evProg").querySelectorAll(".prow").forEach(function(r){var i=r.querySelectorAll("input");var z=i[0].value.trim(),t=i[1].value.trim();if(z||t)prog.push({zeit:z,text:t})});
- var daten={titel:titel,datum:datum,kategorie:$("evKat").value,flyer:alt.flyer||"",programm:prog,hinweis:$("evHinweis").value.trim()};
+ var daten={titel:titel,datum:datum,kategorie:$("evKat").value,flyer:alt.flyer||"",programm:prog,hinweis:$("evHinweis").value.trim(),fotos:[]};
  var pfad=aktuell?aktuell.pfad:ORDNER+"/"+datum+"-"+slug(titel)+".json";
  if(!aktuell&&liste.some(function(e){return e.pfad===pfad}))pfad=ORDNER+"/"+datum+"-"+slug(titel)+"-"+Date.now().toString(36).slice(-4)+".json";
  var belegen=!$("evBelegtBox").hidden&&$("evBelegt").checked;
@@ -492,12 +551,23 @@ $("evSave").onclick=function(){
  if(neuesBild){var bildPfad=FLYER+"/"+datum+"-"+slug(titel)+"-"+Date.now().toString(36).slice(-4)+".jpg";
   p=p.then(function(){return K.gh(K.repo()+"/contents/"+bildPfad,"PUT",{message:"Flyer hochgeladen: "+titel,content:neuesBild})}).then(function(){daten.flyer="/"+bildPfad});
  }
+ var neue=fotos.filter(function(f){return f.data}).length,nr=0,ordner=FOTOS+"/"+datum+"-"+slug(titel),stempel=Date.now().toString(36);
+ fotos.forEach(function(f,i){
+  if(f.data){p=p.then(function(){nr++;meldung("Lade Foto "+nr+" von "+neue+" hoch …");
+   var pf=ordner+"/"+stempel+"-"+String(i+1).padStart(2,"0")+".jpg";
+   return K.gh(K.repo()+"/contents/"+pf,"PUT",{message:"Foto hochgeladen: "+titel,content:f.data}).then(function(){f.pfad="/"+pf;delete f.data})})}
+ });
+ p=p.then(function(){daten.fotos=fotos.map(function(f){return f.pfad})});
  p.then(function(){
+  meldung("Speichere …");
   var body={message:(aktuell?"Veranstaltung geändert: ":"Neue Veranstaltung: ")+titel+" ("+datum+")",content:K.b64encode(JSON.stringify(daten,null,2)+"\n")};
   if(aktuell)body.sha=aktuell.sha;
   return K.gh(K.repo()+"/contents/"+pfad,"PUT",body);
  }).then(function(r){
   var eintrag={pfad:pfad,sha:r.content&&r.content.sha,daten:daten};
+  entfernt.filter(function(p){return /^\/?fotos\//.test(p)}).forEach(function(p){var rel=p.replace(/^\//,"");
+   K.gh(K.repo()+"/contents/"+rel).then(function(j){return K.gh(K.repo()+"/contents/"+rel,"DELETE",{message:"Foto entfernt: "+titel,sha:j.sha})}).catch(function(){})});
+  entfernt=[];
   if(aktuell){liste=liste.map(function(e){return e.pfad===pfad?eintrag:e})}else liste.push(eintrag);
   return belegen?K.markiereBelegt(datum).catch(function(){meldung("Veranstaltung gespeichert, aber der Tag konnte nicht im Raumkalender eingetragen werden. Bitte dort von Hand nachtragen.","err");throw "teil"}):null;
  }).then(function(){
