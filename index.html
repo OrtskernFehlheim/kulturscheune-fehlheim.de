@@ -80,8 +80,9 @@ section{padding:clamp(64px,10vw,120px) 0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;margin-top:8px}
 .tile{position:relative;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;height:100%;text-align:left;background:var(--surface);color:inherit;border:0;padding:0;border-radius:12px;font:inherit;cursor:zoom-in;transition:transform .2s}
 .tile:hover,.tile:focus-visible{transform:translateY(-3px);z-index:5}
-.tile .media{position:relative;display:block;aspect-ratio:1/1}
-.tile .media>img{position:relative;z-index:2;display:block;width:100%;height:100%;object-fit:cover;object-position:center top;border-radius:12px 12px 0 0}
+.tile .media{position:relative;display:block;width:100%;aspect-ratio:1/1;flex:none}
+@supports not (aspect-ratio:1/1){.tile .media{height:0;padding-bottom:100%}}
+.tile .media>img{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center top;border-radius:12px 12px 0 0}
 .fan{position:absolute;inset:0;z-index:1;pointer-events:none}
 .fan img{position:absolute;left:7%;top:7%;width:86%;height:86%;object-fit:cover;border-radius:8px;border:4px solid #fff;background:#fff;box-shadow:0 10px 24px -10px rgba(4,20,28,.55);transform-origin:50% 135%;transform:rotate(var(--r)) translateY(var(--y));transition:transform .45s cubic-bezier(.2,.85,.25,1.15)}
 .tile:hover .fan img,.tile:focus-visible .fan img{transform:rotate(var(--rh)) translateY(var(--yh))}
