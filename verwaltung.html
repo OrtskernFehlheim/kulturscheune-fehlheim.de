@@ -240,7 +240,7 @@ select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--lin
   <p class="small muted" style="margin:0">Erscheinen als Galerie hinter dem Flyer. Reihenfolge per Ziehen oder mit den Pfeilen ändern. Nur Fotos hochladen, mit denen die erkennbaren Personen einverstanden sind.</p>
   <div class="fgrid" id="evFotos"></div>
   <label class="btn btn-ghost fadd" style="margin-bottom:14px">+ Fotos hinzufügen<input type="file" id="evFotoFile" accept="image/jpeg,image/png,image/webp,image/heic" multiple></label>
-  <label class="check" id="evBelegtBox"><input type="checkbox" id="evBelegt" checked><span>Diesen Tag im Raumkalender als <b>belegt</b> eintragen</span></label>
+  <label class="check" id="evBelegtBox"><input type="checkbox" id="evBelegt" checked><span id="evBelegtText">Diesen Tag im Raumkalender als <b>belegt</b> eintragen</span></label>
   <label id="evNotizBox" hidden>Interne Notiz zum Tag <span class="muted" style="font-weight:400">(nur für den Vorstand sichtbar)</span><textarea id="evNotiz" placeholder="z. B. Aufbau ab 14 Uhr, Ansprechpartnerin: …"></textarea></label>
   <p id="evMsg"></p>
   <div class="row" style="justify-content:space-between;margin-top:8px">
@@ -406,15 +406,17 @@ $("loginBtn").onclick=function(){
 };
 $("logout").onclick=function(e){e.preventDefault();if(geaendert()&&!confirm("Ungespeicherte Änderungen verwerfen?"))return;speicher("kf_token",null);token="";original={};tage={};notizen={};notizenOrig={};zeigeLogin()};
 
-function markiereBelegt(datum){
+function markiereBelegt(datum){return setzeTag(datum,"belegt")}
+function setzeTag(datum,neu){
+ // neu: "belegt" oder "frei"; schreibt direkt in die öffentliche Raumbelegung
  return gh(repo+"/contents/"+DATEI).then(function(j){
   var t=ausListe(JSON.parse(b64decode(j.content)||"[]"));
-  if(t[datum]==="belegt")return false;
-  var vorher=original[datum];t[datum]="belegt";
-  return gh(repo+"/contents/"+DATEI,"PUT",{message:"Raumbelegung: "+datum+" belegt (Veranstaltung)",content:b64encode(JSON.stringify(zuListe(t),null,2)+"\n"),sha:j.sha}).then(function(r){
+  if((t[datum]||"frei")===neu)return false;
+  var vorher=original[datum];if(neu==="frei")delete t[datum];else t[datum]=neu;
+  return gh(repo+"/contents/"+DATEI,"PUT",{message:"Raumbelegung: "+datum+" "+(neu==="frei"?"freigegeben":"belegt")+" (Veranstaltung)",content:b64encode(JSON.stringify(zuListe(t),null,2)+"\n"),sha:j.sha}).then(function(r){
    sha=r.content&&r.content.sha;
-   Object.keys(t).forEach(function(k){if((original[k]||"frei")===(tage[k]||"frei"))tage[k]=t[k]});
-   original=t;if((tage[datum]||"frei")===(vorher||"frei"))tage[datum]="belegt";
+   Object.keys(t).concat(Object.keys(original)).forEach(function(k){if((original[k]||"frei")===(tage[k]||"frei")){if(t[k])tage[k]=t[k];else delete tage[k]}});
+   original=t;if((tage[datum]||"frei")===(vorher||"frei")){if(neu==="frei")delete tage[datum];else tage[datum]=neu}
    zeichne();status();return true;
   });
  });
@@ -434,7 +436,7 @@ function speichereNotiz(datum,text){
   });
  });
 }
-window.KF={notizenAn:function(){return notizenAn},notiz:function(d){return notizenOrig[d]||""},speichereNotiz:speichereNotiz,gh:gh,b64encode:b64encode,b64decode:b64decode,repo:function(){return repo},heute:heute,markiereBelegt:markiereBelegt,belegt:function(d){return original[d]==="belegt"}};
+window.KF={notizenAn:function(){return notizenAn},notiz:function(d){return notizenOrig[d]||""},speichereNotiz:speichereNotiz,gh:gh,b64encode:b64encode,b64decode:b64decode,repo:function(){return repo},heute:heute,markiereBelegt:markiereBelegt,setzeTag:setzeTag,belegt:function(d){return original[d]==="belegt"}};
 document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){
  document.querySelectorAll("#tabs button").forEach(function(x){x.setAttribute("aria-selected",x===b)});
  var ev=b.dataset.tab==="events";$("events").hidden=!ev;$("app").hidden=ev;$("bar").hidden=ev;
@@ -544,14 +546,27 @@ function oeffne(e){
  vorschau(d.flyer?bildUrl(d.flyer):"");
  $("evProg").innerHTML="";(d.programm||[]).forEach(function(r){zeile(r.zeit,r.text)});
  fotos=(Array.isArray(d.fotos)?d.fotos:[]).filter(Boolean).map(function(p){return{pfad:p}});entfernt=[];zeigeFotos();
- $("evDel").hidden=!e;$("evBelegt").checked=!e;
- notizGeaendert=false;$("evNotiz").value="";aktualisiereBelegtBox();$("evSave").disabled=false;$("evDlg").showModal();
+ $("evDel").hidden=!e;
+ notizGeaendert=false;hakVorher=null;$("evNotiz").value="";aktualisiereBelegtBox();versteckCheck();$("evSave").disabled=false;$("evDlg").showModal();
 }
 var notizGeaendert=false;
-function aktualisiereBelegtBox(){var d=$("evDatum").value;var schon=d&&K.belegt(d);$("evBelegtBox").hidden=!d||schon;
+function aktualisiereBelegtBox(){var d=$("evDatum").value;var schon=!!(d&&K.belegt(d));$("evBelegtBox").hidden=!d;$("evBelegt").disabled=false;
+ // bereits belegt: Häkchen gesetzt, Abwählen gibt den Tag frei; neu: standardmäßig belegen
+ $("evBelegt").checked=schon||!aktuell;$("evBelegt").dataset.start=schon?"1":"";
+ $("evBelegtText").innerHTML=schon?"Tag ist im Raumkalender als <b>belegt</b> eingetragen (Häkchen entfernen gibt ihn frei)":"Diesen Tag im Raumkalender als <b>belegt</b> eintragen";
  $("evNotizBox").hidden=!d||!K.notizenAn();if(d&&!notizGeaendert)$("evNotiz").value=K.notiz(d)}
 $("evNotiz").addEventListener("input",function(){notizGeaendert=true});
-$("evDatum").addEventListener("change",aktualisiereBelegtBox);
+$("evDatum").addEventListener("change",function(){aktualisiereBelegtBox();versteckCheck()});
+// „Nicht anzeigen“: Tag wird nicht belegt bzw. wieder freigegeben
+var hakVorher=null;
+function versteckCheck(){
+ var v=$("evKat").value==="versteckt",h=$("evBelegt"),schon=h.dataset.start==="1";
+ if(v){if(!h.disabled)hakVorher=h.checked;h.checked=false;h.disabled=true;
+  $("evBelegtText").innerHTML=schon?"Veranstaltung wird nicht angezeigt – der Tag wird im Raumkalender beim Speichern <b>freigegeben</b>":"Veranstaltung wird nicht angezeigt – der Tag wird im Raumkalender nicht belegt"}
+ else if(h.disabled){h.disabled=false;h.checked=hakVorher!==null?hakVorher:(schon||!aktuell);hakVorher=null;
+  $("evBelegtText").innerHTML=schon?"Tag ist im Raumkalender als <b>belegt</b> eingetragen (Häkchen entfernen gibt ihn frei)":"Diesen Tag im Raumkalender als <b>belegt</b> eintragen"}
+}
+$("evKat").addEventListener("change",versteckCheck);
 
 // Bild verkleinern und als JPEG vorbereiten
 $("evFile").onchange=function(){
@@ -576,7 +591,8 @@ $("evSave").onclick=function(){
  var daten={titel:titel,datum:datum,kategorie:$("evKat").value,flyer:alt.flyer||"",programm:prog,hinweis:$("evHinweis").value.trim(),fotos:[]};
  var pfad=aktuell?aktuell.pfad:ORDNER+"/"+datum+"-"+slug(titel)+".json";
  if(!aktuell&&liste.some(function(e){return e.pfad===pfad}))pfad=ORDNER+"/"+datum+"-"+slug(titel)+"-"+Date.now().toString(36).slice(-4)+".json";
- var belegen=!$("evBelegtBox").hidden&&$("evBelegt").checked;
+ var warBelegt=$("evBelegt").dataset.start==="1",hak=$("evBelegt").checked;
+ var tagNeu=$("evBelegtBox").hidden?null:(hak&&!warBelegt?"belegt":(!hak&&warBelegt?"frei":null));
  var notiz=$("evNotizBox").hidden?null:$("evNotiz").value.trim();if(notiz!==null&&notiz===K.notiz(datum))notiz=null;
  $("evSave").disabled=true;meldung("Speichere …");
  var p=Promise.resolve();
@@ -601,7 +617,7 @@ $("evSave").onclick=function(){
    K.gh(K.repo()+"/contents/"+rel).then(function(j){return K.gh(K.repo()+"/contents/"+rel,"DELETE",{message:"Foto entfernt: "+titel,sha:j.sha})}).catch(function(){})});
   entfernt=[];
   if(aktuell){liste=liste.map(function(e){return e.pfad===pfad?eintrag:e})}else liste.push(eintrag);
-  return belegen?K.markiereBelegt(datum).catch(function(){meldung("Veranstaltung gespeichert, aber der Tag konnte nicht im Raumkalender eingetragen werden. Bitte dort von Hand nachtragen.","err");throw "teil"}):null;
+  return tagNeu?K.setzeTag(datum,tagNeu).catch(function(){meldung("Veranstaltung gespeichert, aber der Raumkalender konnte nicht angepasst werden. Bitte dort von Hand ändern.","err");throw "teil"}):null;
  }).then(function(){
   return notiz!==null?K.speichereNotiz(datum,notiz).catch(function(){meldung("Veranstaltung gespeichert, aber die interne Notiz konnte nicht gespeichert werden. Bitte im Raumkalender von Hand nachtragen.","err");throw "teil"}):null;
  }).then(function(){
@@ -617,9 +633,12 @@ $("evSave").onclick=function(){
 $("evDel").onclick=function(){
  if(!aktuell)return;var d=aktuell.daten;
  if(!confirm("„"+(d.titel||"")+"“ wirklich löschen? Tipp: Mit „Nicht anzeigen“ blendest du sie nur aus."))return;
+ var freigeben=d.datum&&K.belegt(d.datum)&&confirm("Den "+d.datum.split("-").reverse().join(".")+" im Raumkalender auch wieder freigeben?");
  meldung("Lösche …");
  K.gh(K.repo()+"/contents/"+aktuell.pfad,"DELETE",{message:"Veranstaltung gelöscht: "+(d.titel||"")+" ("+(d.datum||"")+")",sha:aktuell.sha}).then(function(){
-  liste=liste.filter(function(e){return e!==aktuell});zeige();$("evDlg").close();info("Gelöscht. Der Flyer bleibt im Ordner „flyer“ erhalten. Ein belegter Tag im Raumkalender bleibt ebenfalls bestehen.");
+  return freigeben?K.setzeTag(d.datum,"frei").then(function(){return true},function(){return false}):null;
+ }).then(function(frei){
+  liste=liste.filter(function(e){return e!==aktuell});zeige();$("evDlg").close();info("Gelöscht. Der Flyer bleibt im Ordner „flyer“ erhalten."+(frei===true?" Der Tag ist im Raumkalender wieder frei.":frei===false?" Der Tag konnte im Raumkalender nicht freigegeben werden, bitte dort von Hand ändern.":""));
  }).catch(function(e){meldung("Löschen fehlgeschlagen: "+e.message,"err")});
 };
 $("evNew").onclick=function(){oeffne(null)};
