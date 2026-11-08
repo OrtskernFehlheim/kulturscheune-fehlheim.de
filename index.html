@@ -94,7 +94,7 @@ section{padding:clamp(64px,10vw,120px) 0}
 /* Als nächstes */
 .next-card{margin-top:12px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(28px,5vw,72px);align-items:center}
 .next-flyer{border:0;padding:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 18px 50px -20px rgba(8,55,75,.55)}
-.next-flyer img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center top}
+.next-flyer img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center}
 .kicker{font-family:var(--head);font-weight:800;text-transform:lowercase;color:var(--orange-text);font-size:1.1rem;margin-bottom:.6em}
 .weekday{font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:clamp(1.3rem,2.4vw,1.8rem);color:var(--muted);margin:0 0 .1em}
 .bigdate{font-family:var(--head);font-weight:800;line-height:.9;letter-spacing:-.04em;font-size:clamp(3.2rem,7.4vw,6.6rem);color:var(--ink);white-space:nowrap}
@@ -109,9 +109,11 @@ section{padding:clamp(64px,10vw,120px) 0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;margin-top:8px}
 .tile{position:relative;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;height:100%;text-align:left;background:var(--surface);color:inherit;border:0;padding:0;border-radius:12px;font:inherit;cursor:zoom-in;transition:transform .2s}
 .tile:hover,.tile:focus-visible{transform:translateY(-3px);z-index:5}
-.tile .media{position:relative;display:block;width:100%;aspect-ratio:1/1;flex:none}
-@supports not (aspect-ratio:1/1){.tile .media{height:0;padding-bottom:100%}}
-.tile .media>img{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center top;border-radius:12px 12px 0 0}
+.tile .media{position:relative;display:block;width:100%;aspect-ratio:4/5;flex:none}
+@supports not (aspect-ratio:1/1){.tile .media{height:0;padding-bottom:125%}}
+.tile .media>img{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;border-radius:12px 12px 0 0}
+/* Flyer im alten Quadrat-Format: ganz zeigen statt abschneiden */
+img.fremd{object-fit:contain!important;background:#08374b}
 .fan{position:absolute;inset:0;z-index:1;pointer-events:none}
 .fan img{position:absolute;left:7%;top:7%;width:86%;height:86%;object-fit:cover;border-radius:8px;border:4px solid #fff;background:#fff;box-shadow:0 10px 24px -10px rgba(4,20,28,.55);transform-origin:50% 115%;transform:rotate(var(--r)) translateY(var(--y));transition:transform .45s cubic-bezier(.2,.85,.25,1.15)}
 @media (hover:none){.tile .fan img{transform:rotate(calc(var(--r) * 1.5)) translateY(var(--y))}}
@@ -235,8 +237,8 @@ dialog.gal::backdrop{background:transparent}
 }
 @media (max-width:520px){
  .brand img{height:48px}
- .tiles{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
- .tiles.past{grid-template-columns:1fr 1fr;column-gap:30px;row-gap:28px}
+ .tiles{grid-template-columns:1fr 1fr;column-gap:40px;row-gap:34px}
+ .tiles.past{grid-template-columns:1fr 1fr;column-gap:40px;row-gap:34px}
  .tile .cap{padding:10px 12px 12px}
  .tile .cap b{font-size:.98rem}
  .grid{gap:4px}.grid>*{border-radius:8px;font-size:.9rem}
@@ -481,7 +483,9 @@ function fortschritt(){
 var fRaf=0;function fPlan(){if(!fRaf)fRaf=requestAnimationFrame(function(){fRaf=0;fortschritt()})}
 if(KEIN_HOVER&&!RUHIG){addEventListener("scroll",fPlan,{passive:true});addEventListener("resize",fPlan)}
 
-var FAECHER={1:[["5deg","-2%","11deg","-9%"]],2:[["-5deg","-2%","-12deg","-8%"],["5deg","-2%","12deg","-8%"]],3:[["-6deg","-2%","-14deg","-7%"],["0deg","-4%","0deg","-16%"],["6deg","-2%","14deg","-7%"]]};
+// Flyer, die nicht im Instagram-Hochformat 4:5 sind, vollständig einpassen
+function format(im){function pr(){if(im.naturalWidth&&Math.abs(im.naturalWidth/im.naturalHeight-.8)>.04)im.classList.add("fremd")}if(im.complete)pr();else im.addEventListener("load",pr)}
+var FAECHER={1:[["4deg","-2%","8.8deg","-9%"]],2:[["-4deg","-2%","-9.6deg","-8%"],["4deg","-2%","9.6deg","-8%"]],3:[["-4.8deg","-2%","-11.2deg","-7%"],["0deg","-4%","0deg","-16%"],["4.8deg","-2%","11.2deg","-7%"]]};
 var KAMERA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 function el(t,c,txt){var x=document.createElement(t);if(c)x.className=c;if(txt!=null)x.textContent=txt;return x}
 
@@ -499,7 +503,7 @@ var nc=document.getElementById("nextCard");
 if(kommt.length){
  var e=kommt[0],d=dt(e.datum);
  var fb=el("button","next-flyer");fb.type="button";fb.setAttribute("aria-label","Flyer vergrößern: "+e.titel);
- var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;fb.appendChild(im);fb.onclick=function(){zeige(e,0,im)};
+ var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;fb.appendChild(im);format(im);fb.onclick=function(){zeige(e,0,im)};
  var info=el("div");
  info.appendChild(el("p","kicker","als nächstes"));
  info.appendChild(el("p","weekday",d.toLocaleDateString("de-DE",{weekday:"long"})));
@@ -521,7 +525,7 @@ function kachel(e){
   media.appendChild(fan);
   b.setAttribute("aria-label",e.titel+", "+lang(e.datum)+": Flyer und "+fotos.length+(fotos.length===1?" Foto":" Fotos")+" ansehen");
  }
- var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;im.loading="lazy";media.appendChild(im);
+ var im=el("img");im.src=e.bild;im.alt="Flyer: "+e.titel;im.loading="lazy";media.appendChild(im);format(im);
  if(fotos.length){var bd=el("span","fotobadge");bd.innerHTML=KAMERA;bd.appendChild(document.createTextNode(fotos.length+(fotos.length===1?" foto":" fotos")));media.appendChild(bd)}
  b.appendChild(media);
  b.onclick=function(){
