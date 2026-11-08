@@ -80,7 +80,7 @@ dialog h2{font-size:1.4rem;margin-bottom:14px}
 .grid button.hasnote::before{content:"";position:absolute;bottom:6px;left:50%;width:14px;height:3px;margin-left:-7px;border-radius:2px;background:currentColor;opacity:.7}
 textarea{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%;resize:vertical;min-height:84px}
 .notes{list-style:none;padding:0;margin:0}
-.notes li{display:grid;grid-template-columns:5.2em 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:.94rem}
+.notes li{display:grid;grid-template-columns:7.6em 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:.94rem}
 .notes li b{font-variant-numeric:tabular-nums}
 .notes button{all:unset;cursor:pointer;display:contents}
 .hint{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.86rem;color:var(--muted);margin-top:12px}
@@ -294,6 +294,7 @@ var heute=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().sl
 var aktuellerTag=null,dlgStatus="frei";
 
 function iso(a,b,c){return a+"-"+String(b+1).padStart(2,"0")+"-"+String(c).padStart(2,"0")}
+function minus1(s){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
 function plus1(s){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)}
 function kurz(s){var p=s.split("-");return p[2]+"."+p[1]+"."}
 function b64decode(s){var bin=atob((s||"").replace(/\n/g,""));var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new TextDecoder().decode(bytes)}
@@ -354,17 +355,26 @@ function zeichne(){
  ["Mo","Di","Mi","Do","Fr","Sa","So"].forEach(function(t){var s=document.createElement("span");s.className="dow";s.textContent=t;g.appendChild(s)});
  var first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate();
  for(var i=0;i<first;i++)g.appendChild(document.createElement("span"));
- var liste=$("notes");liste.innerHTML="";var anzahl=0;
+ var liste=$("notes");liste.innerHTML="";var anzahl=0,gruppen=[],gruppe=null;
  for(var d=1;d<=days;d++){
   var s=iso(y,m,d),st=tage[s]||"frei",nz=notizen[s]||"",b=document.createElement("button");
   var ch=(original[s]||"frei")!==st||(notizenOrig[s]||"")!==nz;
   b.type="button";b.className="day"+(st!=="frei"?" "+st:"")+(s<heute?" past":"")+(s===heute?" today":"")+(ch?" changed":"")+(nz?" hasnote":"");
   b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st==="gesperrt"?"nicht verfügbar":st)+(nz?", mit Notiz":""));
   (function(s){b.onclick=function(){oeffne(s)}})(s);g.appendChild(b);
-  if(nz){anzahl++;var li=document.createElement("li"),bt=document.createElement("button");bt.type="button";
-   var bb=document.createElement("b");bb.textContent=kurz(s);var sp=document.createElement("span");sp.textContent=nz;
-   bt.appendChild(bb);bt.appendChild(sp);(function(s){bt.onclick=function(){oeffne(s)}})(s);li.appendChild(bt);liste.appendChild(li)}
+  if(nz&&!(gruppe&&gruppe.text===nz&&gruppe.bis===minus1(s))){gruppe={von:s,bis:s,text:nz};gruppen.push(gruppe)}else if(nz)gruppe.bis=s;else gruppe=null;
  }
+ // aufeinanderfolgende Tage mit gleicher Notiz zusammenfassen, auch über den Monatsrand hinaus
+ gruppen.forEach(function(g){
+  while(notizen[minus1(g.von)]===g.text)g.von=minus1(g.von);
+  while(notizen[plus1(g.bis)]===g.text)g.bis=plus1(g.bis);
+  anzahl++;var li=document.createElement("li"),bt=document.createElement("button");bt.type="button";
+  var bb=document.createElement("b");bb.textContent=g.von===g.bis?kurz(g.von):kurz(g.von)+"–"+kurz(g.bis);
+  var sp=document.createElement("span");sp.textContent=g.text;
+  bt.appendChild(bb);bt.appendChild(sp);
+  bt.onclick=function(){if(g.von===g.bis)oeffne(g.von);else rOeffne(g.von,g.bis,tage[g.von]||"frei",g.text)};
+  li.appendChild(bt);liste.appendChild(li);
+ });
  $("notesTitle").textContent="interne notizen · "+M[m].toLowerCase();
  if(notizenAn)$("notesEmpty").hidden=anzahl>0;
 }
@@ -405,14 +415,18 @@ function rPruefe(){
   l.length+(l.length===1?" Tag":" Tage")+" im Zeitraum, davon "+neu+(neu===1?" wird":" werden")+" auf „"+({frei:"nicht belegt",angefragt:"angefragt",belegt:"belegt",gesperrt:"nicht verfügbar"})[rStatus]+"“ gesetzt."+(l.length>=800?" (Höchstens 800 Tage auf einmal.)":"");
 }
 ["rVon","rBis"].forEach(function(id){$(id).addEventListener("change",function(){if(id==="rVon"&&(!$("rBis").value||$("rBis").value<$("rVon").value))$("rBis").value=$("rVon").value;rPruefe()})});
-$("rangeBtn").onclick=function(){
- var s=iso(y,m,1);$("rVon").value=s<heute?heute:s;$("rBis").value="";$("rNote").value="";
- $("rNoteBox").hidden=!notizenAn;rSetze("belegt");$("rangeDlg").showModal();
-};
+var rAusNotiz=false;
+function rOeffne(von,bis,st,text){
+ rAusNotiz=!!text;
+ $("rVon").value=von;$("rBis").value=bis||"";$("rNote").value=text||"";
+ document.querySelectorAll("#rWt button").forEach(function(w){w.setAttribute("aria-pressed","true")});
+ $("rNoteBox").hidden=!notizenAn;rSetze(st||"belegt");$("rangeDlg").showModal();
+}
+$("rangeBtn").onclick=function(){var s=iso(y,m,1);rOeffne(s<heute?heute:s,"","belegt","")};
 $("rCancel").onclick=function(){$("rangeDlg").close()};
 $("rOk").onclick=function(){
  var l=rTage(),nz=notizenAn?$("rNote").value.trim():"";
- l.forEach(function(s){if(rStatus==="frei")delete tage[s];else tage[s]=rStatus;if(nz)notizen[s]=nz});
+ l.forEach(function(s){if(rStatus==="frei")delete tage[s];else tage[s]=rStatus;if(nz)notizen[s]=nz;else if(rAusNotiz&&notizenAn)delete notizen[s]});
  $("rangeDlg").close();var v=$("rVon").value.split("-");y=+v[0];m=+v[1]-1;zeichne();
  status(l.length+(l.length===1?" Tag":" Tage")+" übernommen. Zum Abschluss auf „Speichern“ tippen.");
  setTimeout(function(){status()},6000);
