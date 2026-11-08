@@ -49,6 +49,8 @@ button{font:inherit}
 .grid button.day:hover{border-color:var(--ink)}
 .grid button.belegt{background:var(--busy);color:var(--on-busy);border-color:var(--busy);font-weight:700}
 .grid button.angefragt{background:var(--orange);color:var(--on-orange);border-color:var(--orange);font-weight:700}
+.grid button.gesperrt,i.na{background-color:#fff;color:#0f2530;border:1.5px solid #0f2530;background-image:linear-gradient(to top left,transparent calc(50% - 1px),#0f2530 calc(50% - 1px),#0f2530 calc(50% + 1px),transparent calc(50% + 1px))}
+.grid button.gesperrt{font-weight:700;background-image:radial-gradient(ellipse 15px 11px at 50% 50%,#fff 96%,transparent 100%),linear-gradient(to top left,transparent calc(50% - 1px),#0f2530 calc(50% - 1px),#0f2530 calc(50% + 1px),transparent calc(50% + 1px))}
 .grid .changed::after{content:"";position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--surface)}
 .grid .past{opacity:.45}
 .grid .today{box-shadow:inset 0 0 0 2px var(--ink)}
@@ -118,6 +120,11 @@ select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--lin
 .flyerbox img,.flyerbox .noimg{width:120px;height:150px;border-radius:10px;object-fit:cover;object-position:center top;background:var(--bg);display:grid;place-items:center;font-size:.8rem;color:var(--muted);text-align:center}
 .prow{display:grid;grid-template-columns:7.5em 1fr 40px;gap:8px;margin-bottom:8px}
 .prow button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;cursor:pointer;font-size:1.1rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wtage{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wtage button{padding:10px 0;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.wtage button[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:#fff}
+#rChoices .choice[aria-checked="true"],#rChoices .choice[aria-pressed="true"]{border-color:var(--petrol)}
 .check{display:flex;gap:10px;align-items:flex-start;font-weight:400}
 .check input{width:20px;height:20px;margin-top:2px;flex:none}
 .danger{background:transparent;border-color:var(--err);color:var(--err)}
@@ -175,11 +182,12 @@ select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--lin
   <!-- Kalender -->
   <section id="app" hidden>
    <h1>raumbelegung</h1>
-   <p class="muted">Tag antippen, Status wählen und bei Bedarf eine interne Notiz ergänzen. Geänderte Tage bekommen einen grünen Punkt, Tage mit Notiz einen Strich. Zum Schluss auf „Speichern“ tippen, nach ein bis zwei Minuten ist die Website aktuell.</p>
+   <p class="muted">Tag antippen, Status wählen und bei Bedarf eine interne Notiz ergänzen. Für längere Zeiträume oder feste Wochentage gibt es „Mehrere Tage auf einmal bearbeiten“. Geänderte Tage bekommen einen grünen Punkt, Tage mit Notiz einen Strich. Zum Schluss auf „Speichern“ tippen, nach ein bis zwei Minuten ist die Website aktuell.</p>
    <div class="card">
     <div class="cal-head"><button id="prev" type="button" aria-label="Voriger Monat">&#8249;</button><strong id="mon" aria-live="polite"></strong><button id="next" type="button" aria-label="Nächster Monat">&#8250;</button></div>
     <div class="grid" id="grid"></div>
-    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i style="border:1px solid var(--line)"></i>frei</span><span>▁ Notiz vorhanden</span></div>
+    <div class="legend"><span><i style="background:var(--busy)"></i>belegt</span><span><i style="background:var(--orange)"></i>angefragt</span><span><i class="na"></i>nicht verfügbar</span><span><i style="border:1px solid var(--line)"></i>frei</span><span>▁ Notiz vorhanden</span></div>
+    <button class="btn btn-ghost" type="button" id="rangeBtn" style="margin-top:16px;width:100%">Mehrere Tage auf einmal bearbeiten</button>
    </div>
    <div class="card" id="notesCard">
     <h2 style="font-size:1.25rem;margin-bottom:6px" id="notesTitle">interne notizen</h2>
@@ -206,12 +214,32 @@ select{font:inherit;font-weight:400;padding:11px 13px;border:1px solid var(--lin
   <button class="choice" type="button" role="radio" data-s="frei"><i style="border:2px solid var(--line)"></i>Nicht belegt</button>
   <button class="choice" type="button" role="radio" data-s="angefragt"><i style="background:var(--orange)"></i>Angefragt</button>
   <button class="choice" type="button" role="radio" data-s="belegt"><i style="background:var(--busy)"></i>Belegt</button>
+  <button class="choice" type="button" role="radio" data-s="gesperrt"><i class="na"></i>Nicht verfügbar</button>
  </div>
  <div id="noteBox" style="margin-top:16px">
   <label style="margin:0">Interne Notiz <span class="muted" style="font-weight:400">(nur für den Vorstand sichtbar)</span><textarea id="noteText" placeholder="z. B. Gesangverein, Probe 19–21 Uhr, Kontakt: …"></textarea></label>
  </div>
  <p class="hint" id="noteOff" hidden>Notizen sind ausgeschaltet, weil kein privates Repository eingerichtet ist.</p>
  <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="dlgClose">Abbrechen</button><button class="btn btn-primary" type="button" id="dlgOk">Übernehmen</button></div>
+</dialog>
+
+<dialog id="rangeDlg">
+ <h2>mehrere tage bearbeiten</h2>
+ <div class="row2"><label>Von<input type="date" id="rVon"></label><label>Bis<input type="date" id="rBis"></label></div>
+ <p style="margin:4px 0 8px;font-weight:600">Nur an diesen Wochentagen</p>
+ <div class="wtage" id="rWt"></div>
+ <p style="margin:16px 0 8px;font-weight:600">Status</p>
+ <div class="choices" role="radiogroup" aria-label="Status für alle Tage" id="rChoices">
+  <button class="choice" type="button" role="radio" data-r="frei"><i style="border:2px solid var(--line)"></i>Nicht belegt</button>
+  <button class="choice" type="button" role="radio" data-r="angefragt"><i style="background:var(--orange)"></i>Angefragt</button>
+  <button class="choice" type="button" role="radio" data-r="belegt"><i style="background:var(--busy)"></i>Belegt</button>
+  <button class="choice" type="button" role="radio" data-r="gesperrt"><i class="na"></i>Nicht verfügbar</button>
+ </div>
+ <div id="rNoteBox" style="margin-top:16px">
+  <label style="margin:0">Interne Notiz für alle Tage <span class="muted" style="font-weight:400">(optional, leer lassen = Notizen bleiben unverändert)</span><textarea id="rNote" placeholder="z. B. Renovierung, Gesangverein Probe …"></textarea></label>
+ </div>
+ <p class="hint" id="rInfo">Bitte Zeitraum wählen.</p>
+ <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn btn-ghost" type="button" id="rCancel">Abbrechen</button><button class="btn btn-primary" type="button" id="rOk" disabled>Übernehmen</button></div>
 </dialog>
 
 <dialog id="evDlg">
@@ -281,7 +309,7 @@ function gh(pfad,method,body){
 
 // Liste <-> Tage
 function ausListe(liste){
- var t={};(liste||[]).forEach(function(e){if(!e||!e.von)return;var bis=e.bis||e.von,d=e.von,n=0;while(d<=bis&&n<400){t[d]=e.status==="angefragt"?"angefragt":"belegt";d=plus1(d);n++}});return t;
+ var t={};(liste||[]).forEach(function(e){if(!e||!e.von)return;var bis=e.bis||e.von,d=e.von,n=0;while(d<=bis&&n<400){t[d]=e.status==="angefragt"||e.status==="gesperrt"?e.status:"belegt";d=plus1(d);n++}});return t;
 }
 function zuListe(t){
  var keys=Object.keys(t).sort(),out=[];
@@ -331,7 +359,7 @@ function zeichne(){
   var s=iso(y,m,d),st=tage[s]||"frei",nz=notizen[s]||"",b=document.createElement("button");
   var ch=(original[s]||"frei")!==st||(notizenOrig[s]||"")!==nz;
   b.type="button";b.className="day"+(st!=="frei"?" "+st:"")+(s<heute?" past":"")+(s===heute?" today":"")+(ch?" changed":"")+(nz?" hasnote":"");
-  b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st)+(nz?", mit Notiz":""));
+  b.textContent=d;b.setAttribute("aria-label",d+". "+M[m]+" "+y+": "+(st==="frei"?"nicht belegt":st==="gesperrt"?"nicht verfügbar":st)+(nz?", mit Notiz":""));
   (function(s){b.onclick=function(){oeffne(s)}})(s);g.appendChild(b);
   if(nz){anzahl++;var li=document.createElement("li"),bt=document.createElement("button");bt.type="button";
    var bb=document.createElement("b");bb.textContent=kurz(s);var sp=document.createElement("span");sp.textContent=nz;
@@ -358,6 +386,37 @@ $("dlgOk").onclick=function(){
 $("dlgClose").onclick=function(){$("dlg").close()};
 $("prev").onclick=function(){m--;if(m<0){m=11;y--}zeichne()};
 $("next").onclick=function(){m++;if(m>11){m=0;y++}zeichne()};
+// Mehrere Tage auf einmal: Zeitraum, Wochentage, Status, optional Notiz
+var rStatus="belegt",WT=["Mo","Di","Mi","Do","Fr","Sa","So"];
+WT.forEach(function(w,i){var b=document.createElement("button");b.type="button";b.textContent=w;b.dataset.i=i;b.setAttribute("aria-pressed","true");b.onclick=function(){b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");rPruefe()};$("rWt").appendChild(b)});
+function rSetze(s){rStatus=s;document.querySelectorAll("#rChoices .choice").forEach(function(c){var on=c.dataset.r===s;c.setAttribute("aria-pressed",on);c.setAttribute("aria-checked",on)});rPruefe()}
+document.querySelectorAll("#rChoices .choice").forEach(function(c){c.onclick=function(){rSetze(c.dataset.r)}});
+function rTage(){
+ var a=$("rVon").value,b=$("rBis").value||a,erg=[];if(!a)return erg;if(b<a){var x=a;a=b;b=x}
+ var an={};document.querySelectorAll("#rWt button").forEach(function(w){if(w.getAttribute("aria-pressed")==="true")an[w.dataset.i]=1});
+ var d=new Date(a+"T12:00:00"),ende=new Date(b+"T12:00:00");
+ while(d<=ende&&erg.length<800){if(an[(d.getDay()+6)%7])erg.push(iso(d.getFullYear(),d.getMonth(),d.getDate()));d.setDate(d.getDate()+1)}
+ return erg;
+}
+function rPruefe(){
+ var l=rTage(),neu=l.filter(function(s){return (tage[s]||"frei")!==rStatus}).length;
+ $("rOk").disabled=!l.length;
+ $("rInfo").textContent=!$("rVon").value?"Bitte Zeitraum wählen.":!l.length?"In diesem Zeitraum liegt kein ausgewählter Wochentag.":
+  l.length+(l.length===1?" Tag":" Tage")+" im Zeitraum, davon "+neu+(neu===1?" wird":" werden")+" auf „"+({frei:"nicht belegt",angefragt:"angefragt",belegt:"belegt",gesperrt:"nicht verfügbar"})[rStatus]+"“ gesetzt."+(l.length>=800?" (Höchstens 800 Tage auf einmal.)":"");
+}
+["rVon","rBis"].forEach(function(id){$(id).addEventListener("change",function(){if(id==="rVon"&&(!$("rBis").value||$("rBis").value<$("rVon").value))$("rBis").value=$("rVon").value;rPruefe()})});
+$("rangeBtn").onclick=function(){
+ var s=iso(y,m,1);$("rVon").value=s<heute?heute:s;$("rBis").value="";$("rNote").value="";
+ $("rNoteBox").hidden=!notizenAn;rSetze("belegt");$("rangeDlg").showModal();
+};
+$("rCancel").onclick=function(){$("rangeDlg").close()};
+$("rOk").onclick=function(){
+ var l=rTage(),nz=notizenAn?$("rNote").value.trim():"";
+ l.forEach(function(s){if(rStatus==="frei")delete tage[s];else tage[s]=rStatus;if(nz)notizen[s]=nz});
+ $("rangeDlg").close();var v=$("rVon").value.split("-");y=+v[0];m=+v[1]-1;zeichne();
+ status(l.length+(l.length===1?" Tag":" Tage")+" übernommen. Zum Abschluss auf „Speichern“ tippen.");
+ setTimeout(function(){status()},6000);
+};
 $("undo").onclick=function(){tage=Object.assign({},original);notizen=Object.assign({},notizenOrig);zeichne();status()};
 
 $("save").onclick=function(){
