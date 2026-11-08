@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /verwaltung.html
+
+Sitemap: https://kulturscheune-fehlheim.de/sitemap.xml

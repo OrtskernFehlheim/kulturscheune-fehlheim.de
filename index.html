@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}
+.raumhinweis{margin:18px 0 6px;padding:14px 18px;border-left:4px solid var(--orange);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--orange) 10%,transparent);max-width:760px}
 /* Dynamischer Aufbau beim Scrollen */
 .rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
 .rv.rv-l{translate:-46px 0}.rv.rv-r{translate:46px 0}.rv.rv-z{translate:0 20px;scale:.94;transition-property:opacity,translate,scale}
@@ -20,15 +21,26 @@ h2.rv.sichtbar::after{width:56px}
 </style>
 <script>["gesturestart","gesturechange","gestureend"].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault()},{passive:false})});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});</script>
 <title>Kulturscheune Fehlheim – Ein Projekt des Ortskern Fehlheim e.V.</title>
-<meta name="description" content="Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.">
+<meta name="description" content="Kulturscheune Fehlheim im Alten Rathaus Fehlheim (Bensheim): Veranstaltungen, Kultur und Räume für die Vereine im Ort. Ein Projekt des Ortskern Fehlheim e.V.">
+<link rel="canonical" href="https://kulturscheune-fehlheim.de/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kulturscheune Fehlheim">
+<meta property="og:title" content="Kulturscheune Fehlheim">
+<meta property="og:description" content="Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.">
+<meta property="og:url" content="https://kulturscheune-fehlheim.de/">
+<meta property="og:image" content="https://kulturscheune-fehlheim.de/bilder/rathaus.jpg">
+<meta property="og:locale" content="de_DE">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Place","name":"Kulturscheune Fehlheim","alternateName":"Altes Rathaus Fehlheim","url":"https://kulturscheune-fehlheim.de/","image":"https://kulturscheune-fehlheim.de/bilder/rathaus.jpg","description":"Kultur und Begegnung im Alten Rathaus Fehlheim, mit Veranstaltungen und Räumen für die Vereine im Ort.","address":{"@type":"PostalAddress","postalCode":"64625","addressLocality":"Bensheim-Fehlheim","addressCountry":"DE"},"sameAs":["https://www.instagram.com/kulturscheune_fehlheim/"],"publicAccess":true}
+</script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#08374b">
 <style>
-@font-face{font-family:"Kulturscheune Head";src:local("Avenir Next Heavy"),local("AvenirNext-Heavy");font-weight:700 900;font-display:swap}
+@font-face{font-family:"Kulturscheune Head";src:local("Avenir Next Heavy"),local("AvenirNext-Heavy"),local("Avenir Next LT Pro Heavy"),local("AvenirNextLTPro-Heavy");font-weight:700 900;font-display:swap}
 :root{
- --head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;
+ --head:"Kulturscheune Head","Avenir Next Heavy","Avenir Next LT Pro Heavy","Avenir Next","Avenir Next LT Pro",Avenir,"Nunito Sans","Century Gothic","Segoe UI",system-ui,sans-serif;
  --petrol:#08374b;--on-petrol:#edf1f2;
  --bg:#eef2f3;--surface:#ffffff;--ink:#0f2530;--muted:#4f6168;--line:#d3dcdf;
  --orange:#e8743b;--on-orange:#1b1007;--orange-text:#b04d17;
@@ -39,7 +51,7 @@ h2.rv.sichtbar::after{width:56px}
 :root[data-theme="dark"]{--bg:#0b1a22;--surface:#11262f;--ink:#e3ecef;--muted:#9db1ba;--line:#223742;--orange-text:#f08a55;--busy:#5fa8c4;--on-busy:#06202b}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Avenir Next","Avenir Next LT Pro",Avenir,"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--orange);outline-offset:3px}
@@ -259,7 +271,7 @@ dialog.gal::backdrop{background:transparent}
 <div class="band">
  <div class="wrap">
   <p class="lead">Kultur und Begegnung mitten im Ort. Das Alte Rathaus öffnet seine Türen für alle in Fehlheim und für die Vereine, die hier zu Hause sind.</p>
-  <div class="btns"><a class="btn btn-primary" href="#programm">Programm ansehen</a><a class="btn btn-ghost" href="#raum">Raum anfragen</a></div>
+  <div class="btns"><a class="btn btn-primary" href="#programm">Programm ansehen</a><a class="btn btn-ghost" href="#raum">Raum anfragen</a><a class="btn btn-primary" href="#verein">Fördermitglied werden</a></div>
  </div>
 </div>
 
@@ -294,6 +306,7 @@ dialog.gal::backdrop{background:transparent}
  <div class="wrap">
   <h2 id="raum-h">raum für vereine</h2>
   <p>Ihr sucht einen Raum für euer Treffen, eine Probe oder eine Veranstaltung? Im Kalender seht ihr, wann das Alte Rathaus noch frei ist.</p>
+  <p class="raumhinweis"><b>Bitte beachten:</b> Wir richten die Räume gerade noch her. Buchen könnt ihr sie voraussichtlich ab <b>Januar 2027</b>. Anfragen für spätere Termine nehmen wir aber schon gern entgegen.</p>
   <ol class="steps">
    <li><b>Tag wählen</b><span>Einen freien Tag im Kalender anklicken.</span></li>
    <li><b>Anfrage senden</b><span>Uhrzeit und Zweck ergänzen, die E-Mail öffnet sich fertig ausgefüllt.</span></li>
@@ -322,6 +335,8 @@ dialog.gal::backdrop{background:transparent}
   <h2 id="verein-h">der verein</h2>
   <div>
    <p>Der Ortskern Fehlheim e.V. will Kultur in den Ort bringen und das Alte Rathaus mit Leben füllen.</p>
+   <p>Du möchtest uns unterstützen? Werde Fördermitglied! Der Beitrag beträgt 12 € im Jahr, gern auch mehr. Einfach den Antrag ausfüllen, unterschreiben und per E-Mail oder Post an uns schicken.</p>
+   <div class="btns" style="margin:18px 0 14px"><a class="btn btn-primary" href="dokumente/antrag-foerdermitgliedschaft.pdf" download="Antrag-Foerdermitgliedschaft-Ortskern-Fehlheim.pdf">Antrag herunterladen (PDF)</a></div>
    <p><a class="textlink" href="satzung.html">Unsere Satzung lesen</a></p>
   </div>
  </div>
@@ -570,7 +585,7 @@ laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter
   ["main section:not(.hero) h2",""],[".band .lead",""],[".band .btns",""],
   [".next-card>*","",.12],[".past-h",""],[".tiles>.tile","rv-z",.09],
   [".house p",""],[".facts li","rv-l",.1],[".house-art","rv-r"],
-  ["#raum>.wrap>p",""],[".steps li","",.12],[".book>div","",.15],
+  ["#raum>.wrap>p:not(.raumhinweis)",""],[".raumhinweis","rv-z"],[".steps li","",.12],[".book>div","",.15],
   [".verein .wrap>div",""],["footer .cols>div","",.1]
  ];
  // Elemente blenden aus, sobald sie ganz aus dem Bild sind, und kommen aus der passenden Richtung wieder
