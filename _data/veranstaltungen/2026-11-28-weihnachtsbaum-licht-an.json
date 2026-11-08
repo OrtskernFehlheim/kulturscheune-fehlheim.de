@@ -2,7 +2,7 @@
   "titel": "Weihnachtsbaum: Licht an",
   "datum": "2026-11-28",
   "kategorie": "automatisch",
-  "flyer": "/flyer/2026-11-28-licht-an.jpg",
+  "flyer": "/flyer/2026-11-28-weihnachtsbaum-licht-an-noqf.jpg",
   "programm": [
     {
       "zeit": "16 Uhr",
@@ -13,5 +13,6 @@
       "text": "Glühwein, Häppchen, Feuer & Musik"
     }
   ],
-  "hinweis": "Bitte Tasse & Spende mitbringen!"
+  "hinweis": "Bitte Tasse & Spende mitbringen!",
+  "fotos": []
 }
