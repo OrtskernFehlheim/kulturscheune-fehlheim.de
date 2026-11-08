@@ -182,7 +182,22 @@ input,textarea{font:inherit;font-weight:400;padding:12px 14px;border:1px solid v
 
 /* Verein */
 .verein .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,72px);align-items:start}
-.verein p{font-size:1.15rem}
+.verein .wrap{align-items:center}
+.verein-text .verein-lead{font-size:clamp(1.2rem,2vw,1.4rem);line-height:1.5;font-weight:500;margin:0 0 20px}
+.verein-text p{font-size:1.05rem;line-height:1.7;margin:0 0 16px}
+.verein-text .verein-link{margin-top:22px}
+.foerder{background:var(--surface);border-radius:18px;padding:clamp(22px,3.5vw,36px);border-top:5px solid var(--orange);box-shadow:0 22px 50px -28px rgba(4,20,28,.5)}
+.foerder-kicker{margin:0 0 4px;font-family:var(--head);font-weight:800;text-transform:lowercase;color:var(--orange-text);font-size:1rem}
+.foerder h3{margin:0 0 14px;font-family:var(--head);font-weight:800;text-transform:lowercase;font-size:clamp(1.6rem,3vw,2.1rem);line-height:1.1}
+.foerder-preis{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 20px}
+.foerder-preis b{font-family:var(--head);font-weight:800;font-size:clamp(2.6rem,6vw,3.4rem);line-height:1}
+.foerder-preis span{color:var(--muted)}
+.foerder-schritte{list-style:none;counter-reset:f;padding:0;margin:0 0 24px;display:grid;gap:12px}
+.foerder-schritte li{counter-increment:f;display:grid;grid-template-columns:2rem 1fr;align-items:baseline;column-gap:10px}
+.foerder-schritte li::before{content:counter(f);display:grid;place-items:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--petrol);color:#fff;font-family:var(--head);font-weight:800;font-size:.9rem;align-self:center}
+.foerder-schritte a{color:inherit;font-weight:600;overflow-wrap:anywhere}
+.foerder .btn{width:100%;justify-content:center}
+.foerder-hinweis{margin:12px 0 0;font-size:.85rem;color:var(--muted);text-align:center}
 .textlink{color:var(--orange-text);font-weight:700;text-underline-offset:4px}
 
 /* Footer */
@@ -338,12 +353,24 @@ dialog.gal::backdrop{background:transparent}
 
 <section class="verein" id="verein" aria-labelledby="verein-h">
  <div class="wrap">
-  <h2 id="verein-h">der verein</h2>
-  <div>
-   <p>Der Ortskern Fehlheim e.V. will Kultur in den Ort bringen und das Alte Rathaus mit Leben füllen.</p>
-   <p>Du möchtest uns unterstützen? Werde Fördermitglied! Der Beitrag beträgt 12 € im Jahr, gern auch mehr. Einfach den Antrag ausfüllen, unterschreiben und per E-Mail oder Post an uns schicken.</p>
-   <div class="btns" style="margin:18px 0 14px"><a class="btn btn-primary" href="dokumente/antrag-foerdermitgliedschaft.pdf" download="Antrag-Foerdermitgliedschaft-Ortskern-Fehlheim.pdf">Antrag herunterladen (PDF)</a></div>
-   <p><a class="textlink" href="satzung.html">Unsere Satzung lesen</a></p>
+  <div class="verein-text">
+   <h2 id="verein-h">der verein</h2>
+   <p class="verein-lead">Hinter der Kulturscheune steht der Ortskern Fehlheim e.V., ein gemeinnütziger Verein von Menschen aus Fehlheim. Unser Ziel: Kunst und Kultur mitten in den Ort bringen, ins Alte Rathaus.</p>
+   <p>Hier entsteht ein Treffpunkt für alle Generationen, offen für ganz Fehlheim. Auch die Vereine im Ort finden bei uns Platz.</p>
+   <p>Wir arbeiten ehrenamtlich. Jeder Beitrag, jede Spende fließt direkt in diese Arbeit. So füllt sich das Alte Rathaus mit Leben.</p>
+   <p class="verein-link"><a class="textlink" href="satzung.html">Unsere Satzung lesen</a></p>
+  </div>
+  <div class="foerder">
+   <p class="foerder-kicker">mitmachen</p>
+   <h3>fördermitglied werden</h3>
+   <p class="foerder-preis"><b>12 €</b><span>im Jahr, gern auch mehr</span></p>
+   <ol class="foerder-schritte">
+    <li><span>Antrag herunterladen</span></li>
+    <li><span>Ausfüllen und unterschreiben</span></li>
+    <li><span>Per E-Mail an <a href="mailto:info@kulturscheune-fehlheim.de">info@kulturscheune-fehlheim.de</a> oder per Post schicken</span></li>
+   </ol>
+   <a class="btn btn-primary" href="dokumente/antrag-foerdermitgliedschaft.pdf" download="Antrag-Foerdermitgliedschaft-Ortskern-Fehlheim.pdf">Antrag herunterladen (PDF)</a>
+   <p class="foerder-hinweis">Der Beitrag wird jährlich per SEPA-Lastschrift eingezogen.</p>
   </div>
  </div>
 </section>
@@ -594,7 +621,7 @@ laden("daten/raumbelegung.json").then(function(liste){TERMINE=(liste||[]).filter
   ["main section:not(.hero) h2",""],[".band .lead",""],[".band .btns",""],
   [".next-card>*","",.12],[".past-h",""],[".tiles>.tile","rv-z",.09],
   [".house p",""],[".facts li","rv-l",.1],[".house-art","rv-r"],
-  ["#raum>.wrap>p:not(.raumhinweis)",""],[".raumhinweis","rv-z"],[".steps li","",.12],[".book>div","",.15],
+  ["#raum>.wrap>p:not(.raumhinweis)",""],[".foerder","rv-z"],[".raumhinweis","rv-z"],[".steps li","",.12],[".book>div","",.15],
   [".verein .wrap>div",""],["footer .cols>div","",.1]
  ];
  // Elemente blenden aus, sobald sie ganz aus dem Bild sind, und kommen aus der passenden Richtung wieder
