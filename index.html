@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>/* kein Zoom: weder automatisch noch per Doppeltippen/Zwei-Finger-Geste */html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}button,a,label,input,select,textarea{touch-action:manipulation}@media (max-width:1024px){input,select,textarea{font-size:16px!important}}
 @media (max-width:520px){.band .btns{flex-direction:column}.band .btns .btn{justify-content:center}}
+/* Veranstaltungsfotos: kein Speichern per Rechtsklick, Ziehen oder langem Drücken */
+img.schutz{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
 .raumhinweis{margin:18px 0 6px;padding:14px 18px;border-left:4px solid var(--orange);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--orange) 10%,transparent);max-width:760px}
 /* Dynamischer Aufbau beim Scrollen */
 .rv{opacity:0;translate:0 34px;transition:opacity .8s cubic-bezier(.2,.7,.2,1),translate .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
@@ -436,7 +438,7 @@ function zeige(e,start,quelle){
  document.getElementById("galTitle").textContent=e.titel;
  var th=document.getElementById("galThumbs");th.innerHTML="";th.hidden=galBilder.length<2;
  document.getElementById("galPrev").hidden=document.getElementById("galNext").hidden=galBilder.length<2;
- galBilder.forEach(function(b,i){var x=el("button");x.type="button";x.setAttribute("aria-label",b.alt);var im=el("img");im.src=b.src;im.alt="";im.loading="lazy";x.appendChild(im);x.onclick=function(){galZeige(i,i>galIdx?1:-1)};th.appendChild(x)});
+ galBilder.forEach(function(b,i){var x=el("button");x.type="button";x.setAttribute("aria-label",b.alt);var im=el("img");im.src=b.src;im.alt="";im.loading="lazy";schuetze(im,i>0);x.appendChild(im);x.onclick=function(){galZeige(i,i>galIdx?1:-1)};th.appendChild(x)});
  galZeige(start,0,true);
  if(!dlg.open)dlg.showModal();
  animiere(dlg,[{backgroundColor:"rgba(4,20,28,0)"},{backgroundColor:"rgba(4,20,28,.96)"}],{duration:420,easing:"ease-out"});
@@ -450,7 +452,7 @@ function zeige(e,start,quelle){
 }
 function galZeige(i,richtung,still){
  var n=galBilder.length;galIdx=(i+n)%n;var b=galBilder[galIdx];
- zoomReset(false);big.src=b.src;big.alt=b.alt;
+ zoomReset(false);big.src=b.src;big.alt=b.alt;schuetze(big,galIdx>0);
  if(!still)bereit(big).then(function(){animiere(big,[{opacity:0,transform:"translateX("+((richtung||0)*60)+"px) scale(.97)"},{opacity:1,transform:"none"}],{duration:340,easing:"cubic-bezier(.2,.8,.2,1)"})});
  document.getElementById("galCount").textContent=n>1?(galIdx+1)+" / "+n:"";
  var th=document.getElementById("galThumbs").children;for(var k=0;k<th.length;k++)th[k].setAttribute("aria-current",k===galIdx);
@@ -524,6 +526,10 @@ if(KEIN_HOVER&&!RUHIG){addEventListener("scroll",fPlan,{passive:true});addEventL
 
 // Flyer, die nicht im Instagram-Hochformat 4:5 sind, vollständig einpassen
 function format(im){function pr(){if(im.naturalWidth&&Math.abs(im.naturalWidth/im.naturalHeight-.8)>.04)im.classList.add("fremd")}if(im.complete)pr();else im.addEventListener("load",pr)}
+// Schutz für Veranstaltungsfotos (Flyer bleiben frei teilbar)
+function schuetze(im,an){im.classList.toggle("schutz",!!an);im.draggable=!an}
+document.addEventListener("contextmenu",function(ev){if(ev.target&&ev.target.classList&&ev.target.classList.contains("schutz"))ev.preventDefault()});
+document.addEventListener("dragstart",function(ev){if(ev.target&&ev.target.classList&&ev.target.classList.contains("schutz"))ev.preventDefault()});
 var FAECHER={1:[["4deg","-2%","8.8deg","-9%"]],2:[["-4deg","-2%","-9.6deg","-8%"],["4deg","-2%","9.6deg","-8%"]],3:[["-4.8deg","-2%","-11.2deg","-7%"],["0deg","-4%","0deg","-16%"],["4.8deg","-2%","11.2deg","-7%"]]};
 var KAMERA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 function el(t,c,txt){var x=document.createElement(t);if(c)x.className=c;if(txt!=null)x.textContent=txt;return x}
@@ -560,7 +566,7 @@ function kachel(e){
  var fotos=e.fotos||[],media=el("span","media");
  if(fotos.length){
   var fan=el("span","fan"),auswahl=fotos.slice(0,3),cfg=FAECHER[auswahl.length];
-  auswahl.forEach(function(src,i){var f=el("img");f.src=src;f.alt="";f.loading="lazy";var c=cfg[i];f.style.setProperty("--r",c[0]);f.style.setProperty("--y",c[1]);f.style.setProperty("--rh",c[2]);f.style.setProperty("--yh",c[3]);fan.appendChild(f)});
+  auswahl.forEach(function(src,i){var f=el("img");f.src=src;f.alt="";f.loading="lazy";schuetze(f,true);var c=cfg[i];f.style.setProperty("--r",c[0]);f.style.setProperty("--y",c[1]);f.style.setProperty("--rh",c[2]);f.style.setProperty("--yh",c[3]);fan.appendChild(f)});
   media.appendChild(fan);
   b.setAttribute("aria-label",e.titel+", "+lang(e.datum)+": Flyer und "+fotos.length+(fotos.length===1?" Foto":" Fotos")+" ansehen");
  }
